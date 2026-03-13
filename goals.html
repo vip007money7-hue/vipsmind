@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Goals</title>
+    <style>
+        body {
+            background: black;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+        }
+#stars{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:-1;
+}
+        .box {
+            margin-top: 80px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+<canvas id="stars"></canvas>
+<div class="box">
+    <div id="nameBox"></div>
+    <div id="dates"></div>
+</div>
+
+<script>
+window.onload = function() {
+const nameBox = document.getElementById("nameBox");
+const dates = document.getElementById("dates");
+
+const mode = localStorage.getItem("challengeMode");
+
+if (!mode) {
+    dates.innerText = "No challenge placed";
+    return;
+}
+
+    const lock = Number(localStorage.getItem("lockTime"));
+    const unlock = Number(localStorage.getItem("unlockTime"));
+    const now = Date.now();
+
+    // ===== SHOW NAME =====
+    if (mode === "group-write" || mode === "group-video") {
+        const groupName = localStorage.getItem("groupName");
+        nameBox.innerText = groupName ? "Dear " + groupName : "";
+    }
+    else if (mode === "single" || mode === "single-video") {
+        const singleName = localStorage.getItem("singleName");
+        nameBox.innerText = singleName ? "Dear " + singleName : "";
+    }
+
+    function format(d) {
+        const date = new Date(d);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        let hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        const ampm = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+
+        return day + "/" + month + "/" + year + " " +
+               hours + ":" + minutes + " " + ampm;
+    }
+
+    // ===== NO CHALLENGE =====
+    if (!lock || !unlock) {
+
+        dates.innerText = "No challenge placed";
+
+        let count = 0;
+        const blink = setInterval(() => {
+            dates.style.visibility =
+                dates.style.visibility === "hidden" ? "visible" : "hidden";
+            count++;
+            if (count === 4) {
+                clearInterval(blink);
+                dates.style.visibility = "visible";
+            }
+        }, 300);
+
+        return;
+    }
+
+    // ===== LOCKED =====
+    if (now < unlock) {
+
+        dates.innerHTML =
+            "<br>Your challenge is locked<br><br>" +
+            "Challenge Locked At: " + format(lock) + "<br><br>" +
+            "Unlocks On: " + format(unlock);
+
+    }
+    else {
+
+        dates.innerHTML =
+            "<br>Your challenge unlocked<br><br>" +
+            "Challenge Locked At: " + format(lock) +
+            "<br><br>" +
+            "<button onclick='startViewing()'>Start Viewing</button>";
+    }
+};
+
+function startViewing() {
+    window.location.href = "view.html";
+}
+</script>
+
+<script>
+history.pushState(null, null, location.href);
+
+window.onpopstate = function () {
+    window.location.href = "index.html";
+};
+</script>
+<script>
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const stars = [];
+
+for (let i = 0; i < 200; i++) {
+    stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.5
+    });
+}
+
+function drawStars(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle="white";
+
+    stars.forEach(star=>{
+        ctx.beginPath();
+        ctx.arc(star.x,star.y,star.r,0,Math.PI*2);
+        ctx.fill();
+    });
+}
+
+drawStars();
+</script>
+</script>
+</body>
+  </html>
