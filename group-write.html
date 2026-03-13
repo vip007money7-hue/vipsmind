@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Group Write</title>
+<style>
+body{
+    background:black;
+    color:white;
+    font-family:sans-serif;
+    text-align:center;
+}
+
+.container{
+    margin-top:100px;
+}
+
+h2{
+    margin-bottom:25px;
+    font-weight:500;
+}
+
+/* NAME BOX */
+input{
+    width:75%;
+    padding:12px;
+    margin:10px auto;
+    display:block;
+    border-radius:12px;
+    border:none;
+    font-size:15px;
+}
+
+/* LETTER BOX */
+textarea{
+    width:75%;
+    height:220px;
+    padding:18px;
+    margin:15px auto;
+    display:block;
+    border-radius:18px;
+    border:none;
+    font-size:15px;
+    resize:none;
+}
+
+/* BUTTON */
+button{
+    width:75%;
+    padding:14px;
+    margin-top:20px;
+    background:#2d6cdf;
+    color:white;
+    border:none;
+    border-radius:14px;
+    font-size:16px;
+}
+
+#timeBox{
+    display:none;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h2 id="stepText"></h2>
+
+<div id="writeBox">
+    <input type="text" id="nameInput" placeholder="Your Name">
+    <textarea id="letterInput" rows="6" placeholder="Write your letter"></textarea>
+</div>
+
+<div id="timeBox">
+    <p>Set one unlock timer for whole group</p>
+    <input type="datetime-local" id="unlockInput">
+</div>
+
+<button id="actionBtn"></button>
+
+</div>
+
+<script>
+
+const total = Number(localStorage.getItem("memberCount"));
+let index = Number(localStorage.getItem("currentIndex")) || 0;
+
+if(!total || total <= 0){
+    alert("Invalid group setup");
+    window.location.href = "group-setup.html";
+}
+
+const stepText = document.getElementById("stepText");
+const actionBtn = document.getElementById("actionBtn");
+const nameInput = document.getElementById("nameInput");
+const letterInput = document.getElementById("letterInput");
+const writeBox = document.getElementById("writeBox");
+const timeBox = document.getElementById("timeBox");
+
+function render(){
+
+ if(index < total){
+        stepText.innerText = (index+1) + " of " + total;
+
+        writeBox.style.display = "block";
+        timeBox.style.display = "none";
+
+        if(index === total - 1){
+    actionBtn.innerText = "Continue to Set Unlock Timer";
+} else {
+    actionBtn.innerText = "Next Person";
+}
+        actionBtn.onclick = nextPerson;
+
+    } else {
+        stepText.innerText = total + " of " + total;
+
+        writeBox.style.display = "none";
+        timeBox.style.display = "block";
+
+        actionBtn.innerText = "Place Challenge";
+        actionBtn.onclick = lockChallenge;
+    }
+}
+
+function nextPerson(){
+
+    const name = nameInput.value.trim();
+    const letter = letterInput.value.trim();
+
+    if(!name || !letter){
+        alert("Please fill all fields");
+        return;
+    }
+
+    let letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
+    letters.push({name:name, text:letter});
+    localStorage.setItem("groupLetters", JSON.stringify(letters));
+
+    index++;
+    localStorage.setItem("currentIndex", index);
+
+    nameInput.value="";
+    letterInput.value="";
+
+    render();
+}
+
+function lockChallenge(){
+
+    const value = document.getElementById("unlockInput").value;
+
+    if(!value){
+        alert("Select unlock time");
+        return;
+    }
+
+    const unlockTime = new Date(value).getTime();
+
+    localStorage.setItem("unlockTime", unlockTime);
+    localStorage.setItem("lockTime", Date.now());
+    localStorage.setItem("challengeMode", "group-write");
+    localStorage.setItem("challengeStatus", "locked");
+
+    window.location.href = "goals.html";
+}
+
+render();
+
+</script>
+
+</body>
+</html>
