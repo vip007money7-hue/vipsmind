@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Future Self</title>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    color: white;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #000000;
+}
+   #stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255,255,255,0.08) 0%,
+        rgba(255,255,255,0.03) 25%,
+        #000 60%,
+        #000 100%
+    );
+}
+/* brand */
+.brand {
+  position: absolute;
+  top: 12px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+ /* GOALS tag */
+  .goals-wrap {
+  position: absolute;
+  top: 66px;        /* EXACT: 1 inch below Vip’smind */
+  left: 0;
+  width: 100%;
+}
+
+ .goals-tag {
+  position: absolute;
+  left: 94px;     /* LEFT SIDE – FIXED */
+  top: 0;
+  background: #ffffff;
+  color: #000;
+  padding: 10px 22px 10px 36px;
+  border-radius: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  z-index: 9999;
+}
+ 
+
+/* left arrow cut */
+ .goals-tag::after {
+   content: "";
+ position: absolute;
+   right: -20px;
+   top: 0;
+   width: 0;
+   height: 0;
+  border-top: 22px solid transparent;
+   border-bottom: 22px solid transparent;
+   border-left: 20px solid #ffffff;
+}
+
+
+/* center message */
+.message {
+  position: absolute;
+ top: 180px;      /* EXACT: text moved down */
+  width: 100%;
+  text-align: center;
+  font-size: 40px;
+}
+
+/* buttons */
+.actions {
+  position: absolute;
+  top:  250px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+}
+
+.single {
+  background-color: #0b5cff;
+  padding: 16px 36px;
+  border-radius: 6px;
+  box-shadow:
+    0 0 6px rgba(11,92,255,0.35),
+    0 0 14px rgba(11,92,255,0.25);
+}
+
+.group {
+  background-color: #b1122a;
+  padding: 16px 36px;
+  border-radius: 6px;
+  box-shadow:
+    0 0 6px rgba(177,18,42,0.35),
+    0 0 14px rgba(177,18,42,0.25);
+}
+
+/* footer text */
+.timer {
+    position: absolute;
+    top: 380px;
+    width: 100%;
+    text-align: center;
+    font-size: 36px;
+    color: #aaa;
+}
+
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="brand">Vip’smind</div>
+ <div class="message">A MESSAGE TO YOUR FUTURE SELF</div>
+<div class="goals-wrap">
+   <div class="goals-tag">GOALS</div>
+   <div class="actions">
+  <div class="single" id="singleBtn">Single</div>
+<div class="group" id="groupBtn">Group</div>
+   </div>
+   <div class="timer" id="timer"></div>
+ </div>
+ <script>
+const savedEmail = localStorage.getItem("userEmail");
+
+if (!savedEmail) {
+    window.location.href = "login.html";
+}
+
+const timerEl = document.getElementById("timer");
+const singleBtn = document.getElementById("singleBtn");
+const groupBtn = document.getElementById("groupBtn");
+const goalsBtn = document.querySelector(".goals-tag");
+
+const unlockTime = Number(localStorage.getItem("unlockTime"));
+
+/* GOALS BUTTON */
+goalsBtn.onclick = function () {
+
+    if (!unlockTime || unlockTime <= 0) {
+
+        // blink effect
+        timerEl.style.transition = "0.2s";
+        timerEl.style.transform = "scale(1.2)";
+        setTimeout(() => {
+            timerEl.style.transform = "scale(1)";
+        }, 200);
+
+        setTimeout(() => {
+            timerEl.style.transform = "scale(1.2)";
+        }, 400);
+
+        setTimeout(() => {
+            timerEl.style.transform = "scale(1)";
+        }, 600);
+
+        return;
+    }
+
+    window.location.href = "goals.html";
+};
+
+
+/* SINGLE BUTTON */
+singleBtn.onclick = function () {
+    localStorage.setItem("challengeMode", "single");
+    window.location.href = "type.html";
+};
+
+
+/* GROUP BUTTON */
+groupBtn.onclick = function () {
+    localStorage.setItem("challengeMode", "group");
+    window.location.href = "type.html";
+};
+
+
+function updateUI() {
+
+    if (!unlockTime || unlockTime <= 0) {
+        timerEl.innerText = "No challenge placed";
+        singleBtn.style.display = "inline-block";
+        groupBtn.style.display = "inline-block";
+        return;
+    }
+
+    const now = Date.now();
+
+    if (now >= unlockTime) {
+
+        timerEl.innerHTML =
+            "Challenge is unlocked<br><br>Please check the challenge in Goals";
+
+        singleBtn.style.display = "none";
+        groupBtn.style.display = "none";
+        return;
+    }
+
+    // LOCKED STATE
+    singleBtn.style.display = "none";
+    groupBtn.style.display = "none";
+
+    const diff = unlockTime - now;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    timerEl.innerHTML =
+        "The Challenge is Locked<br><br>" +
+        "Days : " + days +
+        " | Hours : " + hours +
+        " | Minutes : " + minutes +
+        " | Seconds : " + seconds +
+        "<br><br>To Unlock";
+}
+
+updateUI();
+setInterval(updateUI, 1000);
+
+// STAR BACKGROUND
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const stars = [];
+
+for (let i = 0; i < 200; i++) {
+    stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.5
+    });
+}
+
+function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "white";
+
+    stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+drawStars();
+</script>                                                                                                                                           <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";                                                   import { getAuth  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
+    authDomain: "vipsmind-b34fc.firebaseapp.com",
+    projectId: "vipsmind-b34fc",
+    storageBucket: "vipsmind-b34fc.firebasestorage.app",
+    messagingSenderId: "257825847385",
+    appId: "1:257825847385:web:ee3592957535a99e915948",
+    measurementId: "G-3XVCQ0TCTV"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);                                                                                                         const auth =  getAuth (app) ;
+  const analytics = getAnalytics(app);
+</script>                    
+</body>
+</html>    
