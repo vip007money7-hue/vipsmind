@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Group Video</title>
+
+<style>
+body{
+    margin:0;
+    min-height:100vh;
+    background:#000;
+    color:#fff;
+    font-family:sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.box{
+    width:90%;
+    max-width:400px;
+    background:rgba(0,0,0,0.85);
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+}
+
+input,button{
+    width:100%;
+    padding:10px;
+    margin-top:12px;
+    font-size:16px;
+    border:none;
+    border-radius:6px;
+}
+
+input{
+    background:#fff;
+    color:#000;
+}
+
+button{
+    background:#0d6efd;
+    color:#fff;
+}
+
+button.red{
+    background:#dc3545;
+}
+
+.blurBox{
+    margin-top:20px;
+    padding:20px;
+    background:rgba(255,255,255,0.1);
+    filter:blur(4px);
+}
+video{
+    width:100%;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+
+
+<div class="box" id="mainBox">
+
+<h2 id="stepText"></h2>
+
+<input id="userName" placeholder="Enter your name">
+
+<video id="preview" autoplay muted style="display:none;"></video>
+
+<button id="recordBtn">Start Recording</button>
+
+</div>
+
+<script>
+
+const total = Number(localStorage.getItem("memberCount")) || 0;
+if (!total || total <= 0) {
+    alert("Invalid group setup");
+    window.location.href = "group-setup.html";
+}
+// FIX: Proper index handling
+let index = Number(localStorage.getItem("currentIndex"));
+if (!index || index < 1) {
+    index = 1;
+    localStorage.setItem("currentIndex", 1);
+}
+
+const stepText = document.getElementById("stepText");
+const recordBtn = document.getElementById("recordBtn");
+const preview = document.getElementById("preview");
+const userName = document.getElementById("userName");
+
+let mediaRecorder;
+let recordedChunks = [];
+let stream;
+
+/* ================= INDEXED DB SETUP ================= */
+
+let db;
+
+const request = indexedDB.open("VipsMindDB", 1);
+
+request.onupgradeneeded = function (event) {
+    db = event.target.result;
+    if (!db.objectStoreNames.contains("videos")) {
+        db.createObjectStore("videos", { keyPath: "id" });
+    }
+};
+request.onerror = function () {
+    alert("Database error. Please reload page.");
+};
+request.onsuccess = function (event) {
+    db = event.target.result;
+};
+
+/* ================= STEP TEXT ================= */
+
+function updateStep() {
+    stepText.innerText = index + " of " + total;
+}
+updateStep();
+
+/* ================= RECORD BUTTON ================= */
+
+recordBtn.onclick = async function () {
+
+    if (!userName.value) {
+        alert("Enter your name");
+        return;
+    }
+
+    // START RECORDING
+    if (recordBtn.innerText.includes("Start")) {
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" },
+            audio: true
+        });
+
+        preview.style.display = "block";
+        preview.srcObject = stream;
+
+        recordedChunks = [];
+
+       if (MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) {
+    mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm;codecs=vp9" });
+} else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp8")) {
+    mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm;codecs=vp8" });
+} else {
+    mediaRecorder = new MediaRecorder(stream);
+}
+
+        mediaRecorder.ondataavailable = e => {
+            if (e.data && e.data.size > 0) {
+                recordedChunks.push(e.data);
+            }
+        };
+
+        mediaRecorder.start();
+        recordBtn.innerText = "Stop Recording";
+
+    } else {
+
+        // STOP RECORDING
+        mediaRecorder.stop();
+
+        mediaRecorder.onstop = function () {
+
+            stream.getTracks().forEach(track => track.stop());
+
+         const blob = new Blob(recordedChunks, { type: recordedChunks[0].type });
+
+            // SAVE VIDEO TO INDEXED DB
+            const transaction = db.transaction(["videos"], "readwrite");
+            const store = transaction.objectStore("videos");
+
+            store.put({
+                id: "groupVideo_" + index,
+                blob: blob
+            });
+
+            // Save name only in localStorage
+            let videos = JSON.parse(localStorage.getItem("groupVideos") || "[]");
+
+            videos.push({
+                name: userName.value,
+                id: "groupVideo_" + index
+            });
+
+            localStorage.setItem("groupVideos", JSON.stringify(videos));
+
+            recordedChunks = [];
+            showSavedScreen();
+        };
+
+        recordBtn.innerText = "Start Recording";
+    }
+};
+
+/* ================= AFTER SAVE SCREEN ================= */
+
+function showSavedScreen() {
+
+    document.getElementById("mainBox").innerHTML = `
+        <h2>${index} of ${total}</h2>
+        <h3>${userName.value}</h3>
+
+        <div class="blurBox">
+            Video Saved (Locked)
+        </div>
+
+        <button id="nextBtn" style="margin-top:20px;">
+            ${index === total ? "Continue to Set Unlock Timer" : "Continue to Next"}
+        </button>
+    `;
+
+    document.getElementById("nextBtn").onclick = function () {
+
+        if (index === total) {
+            showTimer();
+        } else {
+            index++;
+            localStorage.setItem("currentIndex", index);
+            window.location.reload();
+        }
+    };
+}
+
+/* ================= TIMER SCREEN ================= */
+
+function showTimer() {
+
+    document.getElementById("mainBox").innerHTML = `
+        <h2>${total} of ${total}</h2>
+        <h2>Set one timer for whole group</h2>
+
+        <input type="datetime-local" id="unlockInput">
+
+        <button class="red" onclick="lockChallenge()">
+            Set Unlock Timer
+        </button>
+    `;
+}
+
+/* ================= LOCK CHALLENGE ================= */
+
+function lockChallenge() {
+
+    const unlock = document.getElementById("unlockInput").value;
+
+    if (!unlock) {
+        alert("Select unlock time");
+        return;
+    }
+
+    localStorage.setItem("lockTime", Date.now());
+    localStorage.setItem("unlockTime", new Date(unlock).getTime());
+    localStorage.setItem("challengeMode", "group-video");
+    localStorage.setItem("challengeStatus", "locked");
+
+    window.location.href = "goals.html";
+}
+
+</script>
+</body>
+</html>
