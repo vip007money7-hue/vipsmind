@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Select Type</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: black;
+    color: white;
+    font-family: system-ui;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 40px;
+    font-size: 28px;
+}
+
+.buttons {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+}
+
+button {
+    padding: 16px 50px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    color: white;
+}
+
+.video {
+    background: #c1121f; /* red */
+}
+
+.letter {
+    background: #1d4ed8; /* blue */
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Select Your Challenge Type</h2>
+
+    <div class="buttons">
+        <!-- VIDEO LEFT -->
+        <button class="video" onclick="goVideo()">Video</button>
+
+        <!-- LETTER RIGHT -->
+        <button class="letter" onclick="goLetter()">Letter</button>
+    </div>
+</div>
+
+<script>
+const mode = localStorage.getItem("challengeMode");
+
+/* LETTER BUTTON */
+function goLetter() {
+
+    if (mode === "single") {
+        // Single → direct
+        window.location.href = "single.html";
+
+    } else {
+        // Group → save type → go to setup
+        localStorage.setItem("groupType", "letter");
+        window.location.href = "group-setup.html";
+    }
+}
+
+
+/* VIDEO BUTTON */
+function goVideo() {
+
+    if (mode === "single") {
+        // Single → direct
+        window.location.href = "single-video.html";
+
+    } else {
+        // Group → save type → go to setup
+        localStorage.setItem("groupType", "video");
+        window.location.href = "group-setup.html";
+    }
+}
+</script>
+</body>
+</html>
