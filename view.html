@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>View Challenge</title>
+<style>
+body {
+    background: black;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+    padding: 20px;
+}
+.card {
+    border: 1px solid white;
+    padding: 20px;
+    margin-top: 30px;
+}
+button {
+    padding: 10px 20px;
+    margin-top: 20px;
+}
+video {
+    width: 100%;
+}
+</style>
+</head>
+<body>
+
+<div id="content"></div>
+
+<script>
+
+const container = document.getElementById("content");
+let mode = localStorage.getItem("challengeMode");
+
+
+
+
+if (!mode) {
+    container.innerHTML = "<h3>No challenge found</h3>";
+    throw new Error("Mode missing");
+}
+/* ================= START SCREEN ================= */
+
+function showStartScreen(title, startFunction) {
+    container.innerHTML =
+        "<h2>Dear " + title + "</h2>" +
+        "<h3>Your Challenge is Unlocked</h3>" +
+        "<button id='startBtn'>Start Viewing</button>";
+
+    document.getElementById("startBtn").onclick = startFunction;
+}
+
+/* ================= SINGLE WRITE ================= */
+
+if (mode === "single") {
+
+    const name = localStorage.getItem("singleName");
+    const letter = localStorage.getItem("letter");
+
+    if (!letter) {
+        container.innerHTML = "<h3>No letter found</h3>";
+    } else {
+
+        showStartScreen(name, function () {
+
+            container.innerHTML =
+                "<div class='card'>" +
+                "<p>" + letter + "</p>" +
+             "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
+                "</div>";
+        });
+    }
+}
+
+/* ================= SINGLE VIDEO ================= */
+
+else if (mode === "single-video") {
+
+    const name = localStorage.getItem("singleName");
+
+    if (!name) {
+        container.innerHTML = "<h3>No video found</h3>";
+    } else {
+
+        const request = indexedDB.open("VipsMindDB", 1);
+
+        request.onupgradeneeded = function (event) {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains("videos")) {
+                db.createObjectStore("videos", { keyPath: "id" });
+            }
+        };
+
+        request.onsuccess = function (event) {
+
+            const db = event.target.result;
+
+            const transaction = db.transaction("videos", "readonly");
+            const store = transaction.objectStore("videos");
+            const getRequest = store.get("singleVideo");
+
+            getRequest.onsuccess = function () {
+
+                const result = getRequest.result;
+
+                if (!result) {
+                    container.innerHTML = "<h3>No saved video found</h3>";
+                    return;
+                }
+
+                const videoURL = URL.createObjectURL(result.blob);
+
+                showStartScreen(name, function () {
+
+                    container.innerHTML =
+                        "<h2>Dear " + name + "</h2>" +
+                        "<div class='card'>" +
+                        "<video src='" + videoURL + "' controls></video>" +
+                       "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
+                        "</div>";
+                });
+            };
+        };
+    }
+}
+/* ================= GROUP WRITE ================= */
+
+else if (mode === "group-write") {
+
+    const groupName = localStorage.getItem("groupName");
+    const letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
+
+    if (letters.length === 0) {
+        container.innerHTML = "<h3>No letters found</h3>";
+    } else {
+
+        showStartScreen(groupName, function () {
+
+            let index = 0;
+
+           function showLetter() {
+
+    const person = letters[index];
+
+    container.innerHTML =
+        "<h2>Dear " + groupName + "</h2>" +
+        "<h3>" + (index + 1) + " of " + letters.length + "</h3>" +
+        "<div class='card'>" +
+        "<h3>" + person.name + "</h3>" +
+        "<p>" + person.text + "</p>" +
+        "<button id='nextBtn'></button>" +
+        "</div>";
+
+    const btn = document.getElementById("nextBtn");
+
+    if (index === letters.length - 1)
+        btn.innerText = "Challenge Completed";
+    else
+        btn.innerText = "Continue to Next";
+
+    btn.onclick = function () {
+        if (index === letters.length - 1)
+            showCompletionScreen();
+        else {
+            index++;
+            showLetter();
+        }
+    };
+}
+            
+
+            showLetter();
+        });
+    }
+}
+
+/* ================= GROUP VIDEO ================= */
+
+else if (mode === "group-video") {
+
+    const videos = JSON.parse(localStorage.getItem("groupVideos")) || [];
+
+    if (videos.length === 0) {
+        container.innerHTML = "<h3>No videos found</h3>";
+    } else {
+
+        let currentIndex = 0;
+
+        const request = indexedDB.open("VipsMindDB", 1);
+
+        request.onupgradeneeded = function (event) {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains("videos")) {
+                db.createObjectStore("videos", { keyPath: "id" });
+            }
+        };
+
+        request.onsuccess = function (event) {
+
+            const db = event.target.result;
+
+            function showVideo() {
+
+                const person = videos[currentIndex];
+
+                const transaction = db.transaction("videos", "readonly");
+                const store = transaction.objectStore("videos");
+                const getRequest = store.get(person.id);
+
+                getRequest.onsuccess = function () {
+
+                    const result = getRequest.result;
+
+                    if (!result) {
+                        container.innerHTML = "<h3>Video not found</h3>";
+                        return;
+                    }
+
+                    const videoURL = URL.createObjectURL(result.blob);
+
+                    container.innerHTML =
+                        "<h2>" + (currentIndex + 1) + " of " + videos.length + "</h2>" +
+                        "<h3>" + person.name + "</h3>" +
+                        "<div class='card'>" +
+                        "<video id='myVideo' src='" + videoURL + "'></video>" +
+                        "<button id='playBtn'>▶️ Start Video</button>" +
+                        "<button id='nextBtn' style='display:none;'></button>" +
+                        "</div>";
+
+                    const video = document.getElementById("myVideo");
+                    const playBtn = document.getElementById("playBtn");
+                    const nextBtn = document.getElementById("nextBtn");
+
+                    playBtn.onclick = function () {
+                        video.requestFullscreen();
+                        video.play();
+                        playBtn.style.display = "none";
+                    };
+
+                    video.onended = function () {
+
+                        playBtn.innerText = "Replay";
+                        playBtn.style.display = "inline-block";
+
+                        if (currentIndex === videos.length - 1)
+                            nextBtn.innerText = "Challenge Completed";
+                        else
+                            nextBtn.innerText = "Continue to Next";
+
+                        nextBtn.style.display = "inline-block";
+                    };
+
+                    nextBtn.onclick = function () {
+                        if (currentIndex === videos.length - 1) {
+                       showCompletionScreen();
+                        } else {
+                            currentIndex++;
+                            showVideo();
+                        }
+                    };
+                };
+            }
+
+            showVideo();
+        };
+    }
+}
+function showCompletionScreen() {
+
+    let titleName = "";
+
+    if (mode === "single" || mode === "single-video") {
+        titleName = localStorage.getItem("singleName") || "User";
+    } 
+    else if (mode === "group-write" || mode === "group-video") {
+        titleName = localStorage.getItem("groupName") || "Group";
+    }
+
+    container.innerHTML = `
+        <h2>Dear ${titleName}</h2>
+        <h3>Your Challenge Completed 🎊🎉🎊</h3>
+
+      <div class="card">
+     <button onclick="downloadContent()">Download</button>
+      <button onclick="shareContent()">Share</button>
+     <button onclick="window.location.href='view.html'">Replay</button>
+  </div>
+
+        <p style="margin-top:40px;opacity:0.7;">
+            Thanks For Using VipsMind
+        </p>
+    `;
+}
+
+function downloadContent() {
+
+    if (mode === "single") {
+
+        const name = localStorage.getItem("singleName") || "User";
+        const letter = localStorage.getItem("letter") || "";
+
+        const content = "Dear " + name + "\n\n" + letter;
+
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "VipsMind_Letter.txt";
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    else if (mode === "group-write") {
+
+        const groupName = localStorage.getItem("groupName") || "Group";
+        const letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
+
+        let content = "Dear " + groupName + "\n\n";
+
+        letters.forEach((p, i) => {
+            content += (i + 1) + ". " + p.name + "\n";
+            content += p.text + "\n\n";
+        });
+
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "VipsMind_Group.txt";
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
+else if (mode === "single-video") {
+
+    const request = indexedDB.open("VipsMindDB", 1);
+
+    request.onsuccess = function (event) {
+
+        const db = event.target.result;
+        const transaction = db.transaction("videos", "readonly");
+        const store = transaction.objectStore("videos");
+        const getRequest = store.get("singleVideo");
+
+        getRequest.onsuccess = function () {
+
+            const result = getRequest.result;
+            if (!result) {
+                alert("Video not found");
+                return;
+            }
+
+            const url = URL.createObjectURL(result.blob);
+
+    const a = document.createElement("a");
+ a.href = url;
+a.download = "VipsMind_Video.mp4";
+ document.body.appendChild(a);
+ a.click();
+ document.body.removeChild(a);
+
+            URL.revokeObjectURL(url);
+        };
+    };
+}
+
+else if (mode === "group-video") {
+
+    const videos = JSON.parse(localStorage.getItem("groupVideos")) || [];
+
+    const request = indexedDB.open("VipsMindDB", 1);
+
+    request.onsuccess = function (event) {
+
+        const db = event.target.result;
+
+        videos.forEach((person, index) => {
+
+            const transaction = db.transaction("videos", "readonly");
+            const store = transaction.objectStore("videos");
+            const getRequest = store.get(person.id);
+
+            getRequest.onsuccess = function () {
+
+                const result = getRequest.result;
+                if (!result) return;
+
+                const url = URL.createObjectURL(result.blob);
+
+   const a = document.createElement("a");
+ a.href = url;
+a.download = "VipsMind_Group_Video_" + (index + 1) + ".mp4";
+ document.body.appendChild(a);
+ a.click();
+document.body.removeChild(a);
+
+                URL.revokeObjectURL(url);
+            };
+        });
+    };
+}
+}
+function shareContent() {
+
+    let name = "";
+
+    if (mode === "single" || mode === "single-video") {
+        name = localStorage.getItem("singleName") || "User";
+    } else {
+        name = localStorage.getItem("groupName") || "Group";
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 1000;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+
+    ctx.font = "bold 60px Arial";
+    ctx.fillText("VipsMind", 400, 150);
+
+    ctx.font = "40px Arial";
+    ctx.fillText("Challenge Completed 🎉", 400, 250);
+
+    ctx.font = "35px Arial";
+    ctx.fillText("Dear " + name, 400, 350);
+
+    ctx.font = "28px Arial";
+    ctx.fillText(new Date().toLocaleDateString(), 400, 450);
+
+    canvas.toBlob(async function(blob) {
+
+        const file = new File([blob], "VipsMind_Completed.png", { type: "image/png" });
+
+        if (navigator.share) {
+            await navigator.share({
+                files: [file],
+                title: "My VipsMind Challenge",
+                text: "I completed my challenge 🎊"
+            });
+        } else {
+            alert("Sharing not supported on this device.");
+        }
+
+    }, "image/png");
+}
+</script>
+</body>
+</html>
