@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Group Setup</title>
+<style>
+body{background:#000;color:#fff;font-family:sans-serif;text-align:center}
+.box{margin:60px auto;width:90%;max-width:400px;border:1px solid #333;padding:20px}
+input{width:100%;margin:10px 0;padding:10px}
+button{background:#0047ab;color:#fff;border:0;padding:10px 20px}
+</style>
+</head>
+<body>
+
+<div class="box">
+<h2>Group Details</h2>
+<input id="gname" placeholder="Group Name">
+<input id="count" type="number" placeholder="Members Count">
+<button onclick="go()">Continue</button>
+</div>
+
+<script>
+function go(){
+  const n=gname.value,c=count.value;
+  if(!n||c<1){alert("Enter details");return;}
+  localStorage.setItem("groupName",n);
+  localStorage.setItem("memberCount",c);
+ localStorage.setItem("currentIndex", 0);
+localStorage.removeItem("groupLetters");
+localStorage.removeItem("groupVideos");
+localStorage.removeItem("letter");
+const type = localStorage.getItem("groupType");
+
+if (type === "video") {
+    location.href = "group-video.html";
+} else {
+    location.href = "group-write.html";
+}
+
+}
+</script>
+</body>
+  </html>
