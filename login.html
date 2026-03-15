@@ -107,56 +107,85 @@ Please continue with your Google account or your permanent email.<br><br>
 This website securely stores your present challenge for future memories.
 </div>
 </div>
-
-<script>
-
-function login(){
-    const email=document.getElementById("email").value.trim();
-
-    if(!email){
-        alert("Please enter your email");
-        return;
-    }
-
-    /* Save Email */
-    localStorage.setItem("userEmail",email);
-
-    /* Redirect */
-    window.location.href="index.html";
-}
-
-</script>
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { 
+getAuth, 
+GoogleAuthProvider, 
+signInWithPopup,
+signInWithEmailAndPassword,
+createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
-  authDomain: "vipsmind-b34fc.firebaseapp.com",
-  projectId: "vipsmind-b34fc",
-  storageBucket: "vipsmind-b34fc.firebasestorage.app",
-  messagingSenderId: "257825847385",
-  appId: "1:257825847385:web:ee3592957535a99e915948"
+apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
+authDomain: "vipsmind-b34fc.firebaseapp.com",
+projectId: "vipsmind-b34fc",
+storageBucket: "vipsmind-b34fc.firebasestorage.app",
+messagingSenderId: "257825847385",
+appId: "1:257825847385:web:ee3592957535a99e915948"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-document.getElementById("googleBtn").addEventListener("click", () => {
-    signInWithPopup(auth, provider)
-    .then((result) => {
-        localStorage.setItem("userEmail", result.user.email);
-        window.location.href="index.html";
-    })
-    .catch((error) => {
-        alert("Google Sign-in Failed");
-        console.log(error);
-    });
-});
-</script>
-<script>
+window.login = function(){
 
+const email=document.getElementById("email").value.trim();
+
+if(!email){
+alert("Please enter your email");
+return;
+}
+
+const password="vipsmind_user";
+
+signInWithEmailAndPassword(auth,email,password)
+.then((userCredential)=>{
+
+localStorage.setItem("userEmail",userCredential.user.email);
+window.location.href="index.html";
+
+})
+.catch(()=>{
+
+createUserWithEmailAndPassword(auth,email,password)
+.then((userCredential)=>{
+
+localStorage.setItem("userEmail",userCredential.user.email);
+window.location.href="index.html";
+
+})
+.catch((error)=>{
+alert(error.message);
+});
+
+});
+
+};
+
+document.getElementById("googleBtn").addEventListener("click", () => {
+
+signInWithPopup(auth, provider)
+.then((result) => {
+
+localStorage.setItem("userEmail", result.user.email);
+window.location.href="index.html";
+
+})
+.catch(() => {
+
+alert("Google Sign-in Failed");
+
+});
+
+});
+
+</script>
+
+<script>
 const canvas = document.getElementById("stars");
 const ctx = canvas.getContext("2d");
 
@@ -188,4 +217,4 @@ drawStars();
 
 </script>
 </body>
-  </html>
+</html>
