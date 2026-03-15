@@ -412,7 +412,7 @@ const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
  a.href = url;
-a.download = "VipsMind_Video.mp4";
+a.download = "VipsMind_" + (localStorage.getItem("singleName") || "Video") + ".mp4";
  document.body.appendChild(a);
  a.click();
 
@@ -424,45 +424,70 @@ URL.revokeObjectURL(url);
     };
 }
 
+
 else if (mode === "group-video") {
 
-    const videos = JSON.parse(localStorage.getItem("groupVideos")) || [];
+const videos = JSON.parse(localStorage.getItem("groupVideos")) || [];
 
-    const request = indexedDB.open("VipsMindDB", 1);
+const request = indexedDB.open("VipsMindDB", 1);
 
-    request.onsuccess = function (event) {
+request.onsuccess = function (event) {
 
-        const db = event.target.result;
+const db = event.target.result;
 
-        videos.forEach((person, index) => {
+let index = 0;
 
-            const transaction = db.transaction("videos", "readonly");
-            const store = transaction.objectStore("videos");
-            const getRequest = store.get(person.id);
+function downloadNext() {
 
-            getRequest.onsuccess = function () {
+if(index >= videos.length) return;
 
-                const result = getRequest.result;
-                if (!result) return;
+const person = videos[index];
 
-             const blob = new Blob([result.blob], { type: "video/mp4" });
+const transaction = db.transaction("videos","readonly");
+const store = transaction.objectStore("videos");
+const getRequest = store.get(person.id);
+
+getRequest.onsuccess = function(){
+
+const result = getRequest.result;
+
+if(!result){
+index++;
+downloadNext();
+return;
+}
+
+const blob = new Blob([result.blob],{type:"video/mp4"});
 const url = URL.createObjectURL(blob);
 
-   const a = document.createElement("a");
- a.href = url;
-a.download = "VipsMind_Group_Video_" + (index + 1) + ".mp4";
- document.body.appendChild(a);
- a.click();
+const a = document.createElement("a");
+a.href = url;
+a.download = "VipsMind_" + person.name + ".mp4";
 
-setTimeout(() => {
+document.body.appendChild(a);
+a.click();
+
+setTimeout(()=>{
 document.body.removeChild(a);
 URL.revokeObjectURL(url);
-}, 1000);
-            };
-        });
-    };
+
+index++;
+downloadNext();
+
+},1500);
+
+};
+
 }
+
+downloadNext();
+
+};
+
 }
+
+}
+
 function shareContent() {
 
     let name = "";
