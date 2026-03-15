@@ -304,26 +304,37 @@ const letter = localStorage.getItem("letter") || "";
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
 
-doc.setFont("Times","Normal");
 
-doc.setFontSize(10);
-doc.text("VipsMind",105,10,{align:"center"});
+// paper color background
+doc.setFillColor(245, 235, 200);
+doc.rect(0,0,210,297,"F");
 
-doc.rect(20,20,170,250);
 
+// small brand title
+doc.setFont("Times","Italic");
+doc.setFontSize(12);
+doc.text("VipsMind",105,15,{align:"center"});
+
+
+// main name
 doc.setFont("Times","Bold");
-doc.setFontSize(22);
+doc.setFontSize(24);
 doc.text(name,105,50,{align:"center"});
 
+
+// letter content
 doc.setFont("Times","Normal");
 doc.setFontSize(14);
 
-const lines = doc.splitTextToSize(letter,150);
-doc.text(lines,30,80);
+const lines = doc.splitTextToSize(letter,160);
+doc.text(lines,25,80);
 
+
+// signature
 doc.setFont("Times","Italic");
-doc.setFontSize(14);
-doc.text("- Past " + name + " -",160,250,{align:"right"});
+doc.setFontSize(16);
+doc.text("- Past " + name + " -",160,260,{align:"right"});
+
 
 doc.save("VipsMind_Letter.pdf");
 
@@ -465,4 +476,4 @@ function shareContent() {
 }
 </script>
 </body>
-</html>
+    </html>
