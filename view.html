@@ -24,6 +24,7 @@ video {
     width: 100%;
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -295,27 +296,39 @@ function showCompletionScreen() {
 
 function downloadContent() {
 
-    if (mode === "single") {
+if (mode === "single") {
 
-        const name = localStorage.getItem("singleName") || "User";
-        const letter = localStorage.getItem("letter") || "";
+const name = localStorage.getItem("singleName") || "User";
+const letter = localStorage.getItem("letter") || "";
 
-        const content = "Dear " + name + "\n\n" + letter;
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
 
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
+doc.setFont("Times","Normal");
 
-       const a = document.createElement("a");
-a.href = url;
-a.download = "VipsMind_Letter.txt";
-document.body.appendChild(a);
-a.click();
+doc.setFontSize(10);
+doc.text("VipsMind",105,10,{align:"center"});
 
-setTimeout(() => {
-document.body.removeChild(a);
-URL.revokeObjectURL(url);
-}, 1000);
-    }
+doc.rect(20,20,170,250);
+
+doc.setFont("Times","Bold");
+doc.setFontSize(22);
+doc.text(name,105,50,{align:"center"});
+
+doc.setFont("Times","Normal");
+doc.setFontSize(14);
+
+const lines = doc.splitTextToSize(letter,150);
+doc.text(lines,30,80);
+
+doc.setFont("Times","Italic");
+doc.setFontSize(14);
+doc.text("- Past " + name + " -",160,250,{align:"right"});
+
+doc.save("VipsMind_Letter.pdf");
+
+}
+      
 
     else if (mode === "group-write") {
 
@@ -452,4 +465,4 @@ function shareContent() {
 }
 </script>
 </body>
-    </html>
+</html>
