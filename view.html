@@ -32,8 +32,7 @@ video {
 <script>
 
 const container = document.getElementById("content");
-let mode = localStorage.getItem("challengeMode");
-
+let mode = localStorage.getItem("challengeMode") || "";
 
 
 
@@ -306,12 +305,16 @@ function downloadContent() {
         const blob = new Blob([content], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
 
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "VipsMind_Letter.txt";
-        a.click();
+       const a = document.createElement("a");
+a.href = url;
+a.download = "VipsMind_Letter.txt";
+document.body.appendChild(a);
+a.click();
 
-        URL.revokeObjectURL(url);
+setTimeout(() => {
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+}, 1000);
     }
 
     else if (mode === "group-write") {
@@ -329,12 +332,16 @@ function downloadContent() {
         const blob = new Blob([content], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
 
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "VipsMind_Group.txt";
-        a.click();
+      const a = document.createElement("a");
+a.href = url;
+a.download = "VipsMind_Group.txt";
+document.body.appendChild(a);
+a.click();
 
-        URL.revokeObjectURL(url);
+setTimeout(() => {
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+}, 1000);
     }
 else if (mode === "single-video") {
 
@@ -355,16 +362,19 @@ else if (mode === "single-video") {
                 return;
             }
 
-            const url = URL.createObjectURL(result.blob);
+        const blob = new Blob([result.blob], { type: "video/mp4" });
+const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
  a.href = url;
 a.download = "VipsMind_Video.mp4";
  document.body.appendChild(a);
  a.click();
- document.body.removeChild(a);
 
-            URL.revokeObjectURL(url);
+setTimeout(() => {
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+}, 1000);
         };
     };
 }
@@ -390,16 +400,19 @@ else if (mode === "group-video") {
                 const result = getRequest.result;
                 if (!result) return;
 
-                const url = URL.createObjectURL(result.blob);
+             const blob = new Blob([result.blob], { type: "video/mp4" });
+const url = URL.createObjectURL(blob);
 
    const a = document.createElement("a");
  a.href = url;
 a.download = "VipsMind_Group_Video_" + (index + 1) + ".mp4";
  document.body.appendChild(a);
  a.click();
-document.body.removeChild(a);
 
-                URL.revokeObjectURL(url);
+setTimeout(() => {
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+}, 1000);
             };
         });
     };
@@ -411,50 +424,32 @@ function shareContent() {
 
     if (mode === "single" || mode === "single-video") {
         name = localStorage.getItem("singleName") || "User";
-    } else {
+    } 
+    else {
         name = localStorage.getItem("groupName") || "Group";
     }
 
-    const canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 1000;
+   const text =
+"I completed my challenge on VipsMind 🎉\n\n" +
+"Try VipsMind here:\n" +
+"https://vip007money7-hue.github.io/vipsmind/";
 
-    const ctx = canvas.getContext("2d");
+    if (navigator.share) {
 
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+        navigator.share({
+            title: "VipsMind Challenge",
+            text: text,
+     url: "https://vip007money7-hue.github.io/vipsmind/"
+        });
 
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
+    } else {
 
-    ctx.font = "bold 60px Arial";
-    ctx.fillText("VipsMind", 400, 150);
+        const whatsapp =
+        "https://wa.me/?text=" + encodeURIComponent(text);
 
-    ctx.font = "40px Arial";
-    ctx.fillText("Challenge Completed 🎉", 400, 250);
-
-    ctx.font = "35px Arial";
-    ctx.fillText("Dear " + name, 400, 350);
-
-    ctx.font = "28px Arial";
-    ctx.fillText(new Date().toLocaleDateString(), 400, 450);
-
-    canvas.toBlob(async function(blob) {
-
-        const file = new File([blob], "VipsMind_Completed.png", { type: "image/png" });
-
-        if (navigator.share) {
-            await navigator.share({
-                files: [file],
-                title: "My VipsMind Challenge",
-                text: "I completed my challenge 🎊"
-            });
-        } else {
-            alert("Sharing not supported on this device.");
-        }
-
-    }, "image/png");
+        window.open(whatsapp, "_blank");
+   }
 }
 </script>
 </body>
-</html>
+    </html>
