@@ -340,33 +340,54 @@ doc.save("VipsMind_Letter.pdf");
 
 }
       
+else if (mode === "group-write") {
 
-    else if (mode === "group-write") {
+const groupName = localStorage.getItem("groupName") || "Group";
+const letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
 
-        const groupName = localStorage.getItem("groupName") || "Group";
-        const letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
 
-        let content = "Dear " + groupName + "\n\n";
+letters.forEach((p, index) => {
 
-        letters.forEach((p, i) => {
-            content += (i + 1) + ". " + p.name + "\n";
-            content += p.text + "\n\n";
-        });
+if(index !== 0) doc.addPage();
 
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
+// paper background
+doc.setFillColor(245,230,180);
+doc.rect(0,0,210,297,"F");
 
-      const a = document.createElement("a");
-a.href = url;
-a.download = "VipsMind_Group.txt";
-document.body.appendChild(a);
-a.click();
+// border
+doc.setDrawColor(120,100,60);
+doc.rect(15,20,180,250);
 
-setTimeout(() => {
-document.body.removeChild(a);
-URL.revokeObjectURL(url);
-}, 1000);
-    }
+// small title
+doc.setFont("Times","Italic");
+doc.setFontSize(12);
+doc.text("VipsMind",105,15,{align:"center"});
+
+// name
+doc.setFont("Times","Bold");
+doc.setFontSize(22);
+doc.text(p.name,105,50,{align:"center"});
+
+// letter text
+doc.setFont("Times","Normal");
+doc.setFontSize(14);
+
+const lines = doc.splitTextToSize(p.text,160);
+doc.text(lines,25,80);
+
+// signature
+doc.setFont("Times","Italic");
+doc.setFontSize(16);
+doc.text("- Past " + p.name + " -",160,260,{align:"right"});
+
+});
+
+doc.save("VipsMind_Group_Letters.pdf");
+
+}
+
 else if (mode === "single-video") {
 
     const request = indexedDB.open("VipsMindDB", 1);
