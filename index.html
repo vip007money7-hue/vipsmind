@@ -120,10 +120,39 @@ body {
     font-size: 36px;
     color: #aaa;
 }
+/* Page Loader */
+#loader{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.9);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:9999;
+}
 
+.spinner{
+width:40px;
+height:40px;
+border:4px solid rgba(255,255,255,0.2);
+border-top:4px solid white;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
 </style>
 </head>
 <body>
+<div id="loader">
+<div class="spinner"></div>
+</div>
 <canvas id="stars"></canvas>
 <div class="brand">Vip’smind</div>
  <div class="message">A MESSAGE TO YOUR FUTURE SELF</div>
@@ -178,15 +207,29 @@ goalsBtn.onclick = function () {
 
 /* SINGLE BUTTON */
 singleBtn.onclick = function () {
+
+    document.getElementById("loader").style.display="flex";
+
     localStorage.setItem("challengeMode", "single");
-    window.location.href = "type.html";
+
+    setTimeout(()=>{
+        window.location.href = "type.html";
+    },600);
+
 };
 
 
 /* GROUP BUTTON */
 groupBtn.onclick = function () {
+
+    document.getElementById("loader").style.display="flex";
+
     localStorage.setItem("challengeMode", "group");
-    window.location.href = "type.html";
+
+    setTimeout(()=>{
+        window.location.href = "type.html";
+    },600);
+
 };
 
 
@@ -240,7 +283,11 @@ const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
+window.addEventListener("resize",()=>{
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+drawStars();
+});
 const stars = [];
 
 for (let i = 0; i < 200; i++) {
