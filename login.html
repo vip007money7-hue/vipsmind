@@ -80,17 +80,52 @@ button:hover{
 .google-btn img{
     width:20px;
 }
+/* Loading Spinner */
+#loader{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.9);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:999;
+}
+
+.spinner{
+width:40px;
+height:40px;
+border:4px solid rgba(255,255,255,0.2);
+border-top:4px solid white;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
 </style>
 
 <script>
 /* ðŸ”¥ AUTO REDIRECT IF ALREADY LOGGED */
 if(localStorage.getItem("userEmail")){
-    window.location.href="index.html";
+document.addEventListener("DOMContentLoaded",()=>{
+document.getElementById("loader").style.display="flex";
+setTimeout(()=>{
+window.location.href="index.html";
+},800);
+});
 }
 </script>
 </head>
 
 <body>
+<div id="loader">
+<div class="spinner"></div>
+</div>
 <canvas id="stars"></canvas>
 <div class="box">
     <h2>Continue with Email</h2>
@@ -146,7 +181,10 @@ signInWithEmailAndPassword(auth,email,password)
 .then((userCredential)=>{
 
 localStorage.setItem("userEmail",userCredential.user.email);
+document.getElementById("loader").style.display="flex";
+setTimeout(()=>{
 window.location.href="index.html";
+},800);
 
 })
 .catch(()=>{
@@ -155,7 +193,10 @@ createUserWithEmailAndPassword(auth,email,password)
 .then((userCredential)=>{
 
 localStorage.setItem("userEmail",userCredential.user.email);
+document.getElementById("loader").style.display="flex";
+setTimeout(()=>{
 window.location.href="index.html";
+},800);
 
 })
 .catch((error)=>{
@@ -172,7 +213,10 @@ signInWithPopup(auth, provider)
 .then((result) => {
 
 localStorage.setItem("userEmail", result.user.email);
+document.getElementById("loader").style.display="flex";
+setTimeout(()=>{
 window.location.href="index.html";
+},800);
 
 })
 .catch(() => {
