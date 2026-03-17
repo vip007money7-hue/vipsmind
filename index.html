@@ -243,7 +243,7 @@ Select Reminder
    </div>
    <div class="timer" id="timer"></div>
  </div>
- <script>
+ <script defer>
 const savedEmail = localStorage.getItem("userEmail");
 
 if (!savedEmail) {
@@ -374,17 +374,17 @@ if(unlockTime && unlockTime > Date.now()){
 checkReminderVisibility();
 
 /* OPEN POPUP */
-reminderBtn.onclick = () => {
+reminderBtn.addEventListener("click", () => {
 popup.style.display="flex";
 };
 
 /* SELECT THEME */
-function selectTheme(t){
+window.selectTheme = function(t){
 selectedTheme = t;
 }
 
 /* SAVE */
-function saveReminder(){
+saveReminder window.saveReminder = function(){
 
 let text = document.getElementById("reminderInput").value;
 
@@ -459,7 +459,9 @@ function drawStars() {
 }
 
 drawStars();
-</script>                                                                                                                                           <script type="module">
+
+</script>   
+<script type="module">                                                                                                                               
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";          
