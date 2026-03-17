@@ -41,14 +41,14 @@ body {
  /* GOALS tag */
   .goals-wrap {
   position: absolute;
-  top: 66px;        /* EXACT: 1 inch below Vip’smind */
+  top: 66px;        /* EXACT: 1 inch below Vipâ€™smind */
   left: 0;
   width: 100%;
 }
 
  .goals-tag {
   position: absolute;
-  left: 94px;     /* LEFT SIDE – FIXED */
+  left: 94px;     /* LEFT SIDE â€“ FIXED */
   top: 0;
   background: #ffffff;
   color: #000;
@@ -150,7 +150,7 @@ animation:spin 1s linear infinite;
 }
 .reminderBtn{
 position:fixed;
-top:100px;   /* 🔥 THIS IS THE FIX */
+top:100px;   /* ðŸ”¥ THIS IS THE FIX */
 right:20px;
 padding:10px 18px;
 background:#ffffff;
@@ -166,15 +166,19 @@ box-shadow:0 0 10px rgba(255,255,255,0.2);
 /* STICKER */
 .sticker{
 position:absolute;
-top:240px;
-width:100%;
+top:260px;
+width:90%;
+left:5%;
 text-align:center;
-font-size:28px;
+font-size:34px;
 letter-spacing:3px;
 color:#fff;
-padding:10px;
+padding:18px;
 display:none;
 pointer-events:none;
+border-radius:14px;
+font-weight:600;
+box-shadow:0 0 25px rgba(255,255,255,0.2);
 }
 /* POPUP */
 .popup{
@@ -191,18 +195,24 @@ z-index:9999;
 }
 
 .popupBox{
-background:#111;
-padding:20px;
-border-radius:12px;
+background:#0d0d0d;
+padding:30px 20px;
+border-radius:16px;
 text-align:center;
+width:90%;
+max-width:500px;
+box-shadow:0 0 30px rgba(255,255,255,0.08);
 }
-
 .popupBox input{
-padding:10px;
-width:200px;
-margin-bottom:15px;
+padding:16px;
+width:100%;
+margin-bottom:20px;
 border:none;
-border-radius:6px;
+border-radius:10px;
+font-size:16px;
+background:#1a1a1a;
+color:#fff;
+outline:none;
 }
 
 .themes{
@@ -213,16 +223,19 @@ justify-content:center;
 }
 
 .theme{
-width:40px;
-height:40px;
+width:60px;
+height:35px;
 border-radius:8px;
 cursor:pointer;
 }
 
-.t1{background:linear-gradient(135deg,#000,#1a1a1a);}
-.t2{background:linear-gradient(135deg,#000,#0f2027);}
-.t3{background:linear-gradient(135deg,#000,#2c003e);}
-.t4{background:linear-gradient(135deg,#000,#1f1f1f);}
+.t1{background:linear-gradient(135deg,#00c6ff,#0072ff);}
+.t2{background:linear-gradient(135deg,#ff7e5f,#feb47b);}
+.t3{background:linear-gradient(135deg,#7f00ff,#e100ff);}
+.t4{background:linear-gradient(135deg,#00ff87,#60efff);}
+.t5{background:linear-gradient(135deg,#ff9966,#ff5e62);}
+.t6{background:linear-gradient(135deg,#36d1dc,#5b86e5);}
+.t7{background:linear-gradient(135deg,#f7971e,#ffd200);}
 </style>
 </head>
 <body>
@@ -230,7 +243,7 @@ cursor:pointer;
 <div class="spinner"></div>
 </div>
 <canvas id="stars"></canvas>
-<div class="brand">Vip’smind</div>
+<div class="brand">Vipâ€™smind</div>
  <div class="message">A MESSAGE TO YOUR FUTURE SELF</div>
  <div id="reminderSticker" class="sticker"></div>
 
@@ -373,15 +386,34 @@ if(unlockTime && unlockTime > Date.now()){
     reminderBtn.style.display="none";
 }
 }
-reminderBtn.style.display = "block";
 checkReminderVisibility();
 
 /* OPEN POPUP */
 reminderBtn.addEventListener("click", () => {
+reminderBtn.style.display = "none";
     const popup = document.getElementById("reminderPopup");
+
     if(popup){
         popup.style.display = "flex";
+
+        const input = document.getElementById("reminderInput");
+        const applyBtn = document.getElementById("applyBtn");
+
+        input.value = "";
+        applyBtn.style.display = "none";
+
+        function handleInput(){
+            if(input.value.trim()){
+                applyBtn.style.display = "inline-block";
+            } else {
+                applyBtn.style.display = "none";
+            }
+        }
+
+        input.removeEventListener("input", handleInput);
+        input.addEventListener("input", handleInput);
     }
+
 });
 /* SELECT THEME */
 window.selectTheme = function(t){
@@ -400,20 +432,32 @@ text = text.toUpperCase();
 localStorage.setItem("reminderText", text);
 localStorage.setItem("reminderTheme", selectedTheme);
 
-applySticker(text, selectedTheme);
+document.getElementById("loader").style.display="flex";
 
-popup.style.display="none";
+setTimeout(()=>{
+
+    // apply sticker
+    applySticker(text, selectedTheme);
+
+    // hide popup
+    popup.style.display="none";
+
+    // redirect to home (reload page)
+    window.location.href = "index.html";
+
+},1500);
 }
-
 /* APPLY */
 function applySticker(text, theme){
 
 sticker.innerText = text;
-
-if(theme==="t1") sticker.style.background="linear-gradient(135deg,#000,#1a1a1a)";
-if(theme==="t2") sticker.style.background="linear-gradient(135deg,#000,#0f2027)";
-if(theme==="t3") sticker.style.background="linear-gradient(135deg,#000,#2c003e)";
-if(theme==="t4") sticker.style.background="linear-gradient(135deg,#000,#1f1f1f)";
+if(theme==="t1") sticker.style.background="linear-gradient(135deg,#00c6ff,#0072ff)";
+if(theme==="t2") sticker.style.background="linear-gradient(135deg,#ff7e5f,#feb47b)";
+if(theme==="t3") sticker.style.background="linear-gradient(135deg,#7f00ff,#e100ff)";
+if(theme==="t4") sticker.style.background="linear-gradient(135deg,#00ff87,#60efff)";
+if(theme==="t5") sticker.style.background="linear-gradient(135deg,#ff9966,#ff5e62)";
+if(theme==="t6") sticker.style.background="linear-gradient(135deg,#36d1dc,#5b86e5)";
+if(theme==="t7") sticker.style.background="linear-gradient(135deg,#f7971e,#ffd200)";
 
 sticker.style.display="inline-block";
 sticker.style.borderRadius="12px";
@@ -502,16 +546,18 @@ onAuthStateChanged(auth, (user) => {
 
 <div class="popupBox">
 
-<input id="reminderInput" placeholder="Your reminder...">
+<input id="reminderInput" placeholder="Text a Reminder...">
 
 <div class="themes">
 <div class="theme t1" onclick="selectTheme('t1')"></div>
 <div class="theme t2" onclick="selectTheme('t2')"></div>
 <div class="theme t3" onclick="selectTheme('t3')"></div>
 <div class="theme t4" onclick="selectTheme('t4')"></div>
+<div class="theme t5" onclick="selectTheme('t5')"></div>
+<div class="theme t6" onclick="selectTheme('t6')"></div>
+<div class="theme t7" onclick="selectTheme('t7')"></div>
 </div>
-
-<button onclick="saveReminder()">Apply</button>
+<button id="applyBtn" onclick="saveReminder()" style="display:none;background:#00c853;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-weight:600;">Apply</button>
 
 </div>
 </div>  
