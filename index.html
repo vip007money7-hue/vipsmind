@@ -243,7 +243,7 @@ Select Reminder
    </div>
    <div class="timer" id="timer"></div>
  </div>
- <script defer>
+ <script>
 const savedEmail = localStorage.getItem("userEmail");
 
 if (!savedEmail) {
@@ -375,16 +375,15 @@ checkReminderVisibility();
 
 /* OPEN POPUP */
 reminderBtn.addEventListener("click", () => {
-popup.style.display="flex";
-};
-
+    popup.style.display = "flex";
+});
 /* SELECT THEME */
 window.selectTheme = function(t){
 selectedTheme = t;
 }
 
 /* SAVE */
-saveReminder window.saveReminder = function(){
+window.saveReminder = function(){
 
 let text = document.getElementById("reminderInput").value;
 
