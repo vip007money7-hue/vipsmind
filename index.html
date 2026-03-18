@@ -19,7 +19,6 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    pointer-events: none;
     background: radial-gradient(
         ellipse at center,
         rgba(255,255,255,0.08) 0%,
@@ -41,14 +40,14 @@ body {
  /* GOALS tag */
   .goals-wrap {
   position: absolute;
-  top: 66px;        /* EXACT: 1 inch below Vipâ€™smind */
+  top: 66px;        /* EXACT: 1 inch below Vip’smind */
   left: 0;
   width: 100%;
 }
 
  .goals-tag {
   position: absolute;
-  left: 94px;     /* LEFT SIDE â€“ FIXED */
+  left: 94px;     /* LEFT SIDE – FIXED */
   top: 0;
   background: #ffffff;
   color: #000;
@@ -148,94 +147,6 @@ animation:spin 1s linear infinite;
 0%{transform:rotate(0deg);}
 100%{transform:rotate(360deg);}
 }
-.reminderBtn{
-position:fixed;
-top:100px;   /* ðŸ”¥ THIS IS THE FIX */
-right:20px;
-padding:10px 18px;
-background:#ffffff;
-color:#000;
-border:none;
-border-radius:6px;
-font-size:13px;
-font-weight:600;
-cursor:pointer;
-z-index:10001;
-box-shadow:0 0 10px rgba(255,255,255,0.2);
-}
-/* STICKER */
-.sticker{
-position:absolute;
-top:260px;
-width:90%;
-left:5%;
-text-align:center;
-font-size:34px;
-letter-spacing:3px;
-color:#fff;
-padding:18px;
-display:none;
-pointer-events:none;
-border-radius:14px;
-font-weight:600;
-box-shadow:0 0 25px rgba(255,255,255,0.2);
-}
-/* POPUP */
-.popup{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.9);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:9999;
-}
-
-.popupBox{
-background:#0d0d0d;
-padding:30px 20px;
-border-radius:16px;
-text-align:center;
-width:90%;
-max-width:500px;
-box-shadow:0 0 30px rgba(255,255,255,0.08);
-}
-.popupBox input{
-padding:16px;
-width:100%;
-margin-bottom:20px;
-border:none;
-border-radius:10px;
-font-size:16px;
-background:#1a1a1a;
-color:#fff;
-outline:none;
-}
-
-.themes{
-display:flex;
-gap:10px;
-margin-bottom:15px;
-justify-content:center;
-}
-
-.theme{
-width:60px;
-height:35px;
-border-radius:8px;
-cursor:pointer;
-}
-
-.t1{background:linear-gradient(135deg,#00c6ff,#0072ff);}
-.t2{background:linear-gradient(135deg,#ff7e5f,#feb47b);}
-.t3{background:linear-gradient(135deg,#7f00ff,#e100ff);}
-.t4{background:linear-gradient(135deg,#00ff87,#60efff);}
-.t5{background:linear-gradient(135deg,#ff9966,#ff5e62);}
-.t6{background:linear-gradient(135deg,#36d1dc,#5b86e5);}
-.t7{background:linear-gradient(135deg,#f7971e,#ffd200);}
 </style>
 </head>
 <body>
@@ -243,13 +154,8 @@ cursor:pointer;
 <div class="spinner"></div>
 </div>
 <canvas id="stars"></canvas>
-<div class="brand">Vipâ€™smind</div>
+<div class="brand">Vip’smind</div>
  <div class="message">A MESSAGE TO YOUR FUTURE SELF</div>
- <div id="reminderSticker" class="sticker"></div>
-
-<button id="reminderBtn" class="reminderBtn" style="display:none;">
-Select Reminder
-</button>
 <div class="goals-wrap">
    <div class="goals-tag">GOALS</div>
    <div class="actions">
@@ -371,117 +277,6 @@ function updateUI() {
 updateUI();
 setInterval(updateUI, 1000);
 
-
-const reminderBtn = document.getElementById("reminderBtn");
-const popup = document.getElementById("reminderPopup");
-const sticker = document.getElementById("reminderSticker");
-
-let selectedTheme = "t1";
-
-/* SHOW BUTTON ONLY WHEN TIMER ACTIVE */
-function checkReminderVisibility(){
-if(unlockTime && unlockTime > Date.now()){
-    reminderBtn.style.display="block";
-}else{
-    reminderBtn.style.display="none";
-}
-}
-checkReminderVisibility();
-window.history.pushState(null, null, window.location.href);
-
-window.onpopstate = function () {
-    if (popup && popup.style.display === "flex") {
-        popup.style.display = "none";
-        reminderBtn.style.display = "block";
-    } else {
-        window.location.href = "index.html";
-    }
-};
-/* OPEN POPUP */
-reminderBtn.addEventListener("click", () => {
-    if(!popup) return;
-
-    popup.style.display = "flex";
-    reminderBtn.style.display = "none";
-        const input = document.getElementById("reminderInput");
-        const applyBtn = document.getElementById("applyBtn");
-
-        input.value = "";
-        applyBtn.style.display = "none";
-
-        function handleInput(){
-            if(input.value.trim()){
-                applyBtn.style.display = "inline-block";
-            } else {
-                applyBtn.style.display = "none";
-            }
-        }
-
-        input.removeEventListener("input", handleInput);
-        input.addEventListener("input", handleInput);
-});
-/* SELECT THEME */
-window.selectTheme = function(t){
-selectedTheme = t;
-}
-
-/* SAVE */
-window.saveReminder = function(){
-
-let text = document.getElementById("reminderInput").value;
-
-if(!text.trim()) return;
-
-text = text.toUpperCase();
-
-localStorage.setItem("reminderText", text);
-localStorage.setItem("reminderTheme", selectedTheme);
-
-document.getElementById("loader").style.display="flex";
-
-setTimeout(()=>{
-
-    // apply sticker
-    applySticker(text, selectedTheme);
-
-    // hide popup
-   document.getElementById("reminderPopup").style.display="none";
-
-    // redirect to home (reload page)
-    window.location.href = "index.html";
-
-},1500);
-}
-/* APPLY */
-function applySticker(text, theme){
-
-sticker.innerText = text;
-if(theme==="t1") sticker.style.background="linear-gradient(135deg,#00c6ff,#0072ff)";
-if(theme==="t2") sticker.style.background="linear-gradient(135deg,#ff7e5f,#feb47b)";
-if(theme==="t3") sticker.style.background="linear-gradient(135deg,#7f00ff,#e100ff)";
-if(theme==="t4") sticker.style.background="linear-gradient(135deg,#00ff87,#60efff)";
-if(theme==="t5") sticker.style.background="linear-gradient(135deg,#ff9966,#ff5e62)";
-if(theme==="t6") sticker.style.background="linear-gradient(135deg,#36d1dc,#5b86e5)";
-if(theme==="t7") sticker.style.background="linear-gradient(135deg,#f7971e,#ffd200)";
-
-sticker.style.display="inline-block";
-sticker.style.borderRadius="12px";
-sticker.style.boxShadow="0 0 20px rgba(255,255,255,0.2)";
-}
-
-/* LOAD SAVED */
-const savedText = localStorage.getItem("reminderText");
-const savedTheme = localStorage.getItem("reminderTheme");
-
-if(savedText){
-    applySticker(savedText, savedTheme || "t1");
-}
-
-function closePopup(){
-    document.getElementById("reminderPopup").style.display = "none";
-    reminderBtn.style.display = "block";
-}
-
 // STAR BACKGROUND
 const canvas = document.getElementById("stars");
 const ctx = canvas.getContext("2d");
@@ -516,9 +311,7 @@ function drawStars() {
 }
 
 drawStars();
-
-</script>   
-<script type="module">                                                                                                                               
+</script>                                                                                                                                           <script type="module">
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";          
@@ -549,31 +342,6 @@ onAuthStateChanged(auth, (user) => {
   }
 
 });
-</script>                  
-<div id="reminderPopup" class="popup">
-
-<div class="popupBox">
-<div style="color:#aaa;font-size:14px;margin-bottom:10px;letter-spacing:2px;">
- WRITE A REMINDER
-</div>
-<button onclick="closePopup()" 
-style="position:absolute;right:15px;top:10px;background:none;border:none;color:#aaa;font-size:18px;">
-
-</button>
-<input id="reminderInput" placeholder="Text a Reminder...">
-
-<div class="themes">
-<div class="theme t1" onclick="selectTheme('t1')"></div>
-<div class="theme t2" onclick="selectTheme('t2')"></div>
-<div class="theme t3" onclick="selectTheme('t3')"></div>
-<div class="theme t4" onclick="selectTheme('t4')"></div>
-<div class="theme t5" onclick="selectTheme('t5')"></div>
-<div class="theme t6" onclick="selectTheme('t6')"></div>
-<div class="theme t7" onclick="selectTheme('t7')"></div>
-</div>
-<button id="applyBtn" onclick="saveReminder()" style="display:none;background:#00c853;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-weight:600;">Apply</button>
-
-</div>
-</div>  
+</script>                    
 </body>
 </html>    
