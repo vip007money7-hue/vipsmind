@@ -342,14 +342,13 @@ onAuthStateChanged(auth, (user) => {
   }
 
 });
-// 🔥 STRONG BACK BLOCK (WORKS FIRST TIME)
-window.history.pushState(null, null, window.location.href);
+//  EXIT WEBSITE ON BACK (PERFECT)
+
+window.history.replaceState(null, null, location.href);
+window.history.pushState(null, null, location.href);
 
 window.onpopstate = function () {
-
-    // push again to stay on same page
-    window.history.pushState(null, null, window.location.href);
-
+    window.location.replace("https://www.google.com");
 };
 </script>                    
 </body>
