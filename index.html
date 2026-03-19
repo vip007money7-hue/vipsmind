@@ -346,7 +346,33 @@ onAuthStateChanged(auth, (user) => {
 window.addEventListener("pageshow", function () {
     document.getElementById("loader").style.display = "none";
 });
+let audioCtx;
+let isPlaying = false;
 
+function playAmbientSound() {
+
+    if (isPlaying) return;
+
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.type = "sine";   // smooth sound
+ oscillator.frequency.value = 200 + Math.random() * 40;   // base tone (calm)
+
+    gainNode.gain.value = 0.05; // very soft volume
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.start();
+
+    isPlaying = true;
+}
+document.addEventListener("click", function () {
+    playAmbientSound();
+}, { once: true });
 </script>                    
 </body>
 </html>    
