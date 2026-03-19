@@ -342,6 +342,13 @@ onAuthStateChanged(auth, (user) => {
   }
 
 });
+// BLOCK BACK NAVIGATION
+window.history.pushState(null, null, window.location.href);
+
+window.onpopstate = function () {
+    // exit app / close tab
+    window.location.href = "about:blank";
+};
 </script>                    
 </body>
 </html>    
