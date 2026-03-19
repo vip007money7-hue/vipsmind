@@ -73,12 +73,12 @@ function goLetter() {
 
     if (mode === "single") {
         // Single → direct
-        window.location.href = "single.html";
+window.location.replace("single.html");
 
     } else {
         // Group → save type → go to setup
         localStorage.setItem("groupType", "letter");
-        window.location.href = "group-setup.html";
+        window.location.replace("group-setup.html");
     }
 }
 
@@ -88,12 +88,12 @@ function goVideo() {
 
     if (mode === "single") {
         // Single → direct
-        window.location.href = "single-video.html";
+        window.location.replace("single-video.html");
 
     } else {
         // Group → save type → go to setup
         localStorage.setItem("groupType", "video");
-        window.location.href = "group-setup.html";
+        window.location.replace("group-setup.html");
     }
 }
 </script>
