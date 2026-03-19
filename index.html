@@ -180,7 +180,7 @@ const unlockTime = Number(localStorage.getItem("unlockTime"));
 
 /* GOALS BUTTON */
 goalsBtn.onclick = function () {
-
+playClick();
     if (!unlockTime || unlockTime <= 0) {
 
         // blink effect
@@ -207,7 +207,7 @@ goalsBtn.onclick = function () {
 
 /* SINGLE BUTTON */
 singleBtn.onclick = function () {
-
+playClick();
     document.getElementById("loader").style.display="flex";
 
     localStorage.setItem("challengeMode", "single");
@@ -221,7 +221,7 @@ singleBtn.onclick = function () {
 
 /* GROUP BUTTON */
 groupBtn.onclick = function () {
-
+playClick();
     document.getElementById("loader").style.display="flex";
 
     localStorage.setItem("challengeMode", "group");
@@ -348,31 +348,15 @@ window.addEventListener("pageshow", function () {
 });
 let audioCtx;
 let isPlaying = false;
+function playClick() {
+    const sound = document.getElementById("clickSound");
+    if (!sound) return;
 
-function playAmbientSound() {
-
-    if (isPlaying) return;
-
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    oscillator.type = "sine";   // smooth sound
- oscillator.frequency.value = 200 + Math.random() * 40;   // base tone (calm)
-
-    gainNode.gain.value = 0.05; // very soft volume
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    oscillator.start();
-
-    isPlaying = true;
+    sound.currentTime = 0;
+    sound.play();
 }
-document.addEventListener("click", function () {
-    playAmbientSound();
-}, { once: true });
-</script>                    
+
+</script>          
+<audio id="clickSound" src="click.mp3"></audio>
 </body>
 </html>    
