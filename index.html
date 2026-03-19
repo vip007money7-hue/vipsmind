@@ -165,12 +165,6 @@ animation:spin 1s linear infinite;
    <div class="timer" id="timer"></div>
  </div>
  <script>
-const savedEmail = localStorage.getItem("userEmail");
-
-if (!savedEmail) {
-   window.location.replace("login.html");
-}
-
 const timerEl = document.getElementById("timer");
 const singleBtn = document.getElementById("singleBtn");
 const groupBtn = document.getElementById("groupBtn");
