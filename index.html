@@ -168,7 +168,7 @@ animation:spin 1s linear infinite;
 const savedEmail = localStorage.getItem("userEmail");
 
 if (!savedEmail) {
-    window.location.href = "login.html";
+   window.location.replace("login.html");
 }
 
 const timerEl = document.getElementById("timer");
@@ -213,7 +213,7 @@ singleBtn.onclick = function () {
     localStorage.setItem("challengeMode", "single");
 
     setTimeout(()=>{
-        window.location.href = "type.html";
+        window.location.replace("type.html");
     },600);
 
 };
@@ -227,7 +227,7 @@ groupBtn.onclick = function () {
     localStorage.setItem("challengeMode", "group");
 
     setTimeout(()=>{
-        window.location.href = "type.html";
+       window.location.replace("type.html");
     },600);
 
 };
@@ -338,7 +338,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 onAuthStateChanged(auth, (user) => {
 
   if (!user) {
-    window.location.href = "login.html";
+    window.location.replace("login.html");
   }
 
 });
