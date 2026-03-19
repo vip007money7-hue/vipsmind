@@ -342,12 +342,14 @@ onAuthStateChanged(auth, (user) => {
   }
 
 });
-// BLOCK BACK NAVIGATION
+// 🔥 STRONG BACK BLOCK (WORKS FIRST TIME)
 window.history.pushState(null, null, window.location.href);
 
 window.onpopstate = function () {
-    // exit app / close tab
-    window.location.href = "about:blank";
+
+    // push again to stay on same page
+    window.history.pushState(null, null, window.location.href);
+
 };
 </script>                    
 </body>
