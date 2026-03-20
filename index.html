@@ -342,16 +342,7 @@ onAuthStateChanged(auth, (user) => {
 window.addEventListener("pageshow", function () {
     document.getElementById("loader").style.display = "none";
 });
-let audioCtx;
-let isPlaying = false;
-function playClick() {
-    const sound = document.getElementById("clickSound");
-    if (!sound) return;
-
-    sound.currentTime = 0;
-    sound.play();
-}
-       
+   
 
 </script>          
 <audio id="clickSound" src="click.mp3"></audio>
