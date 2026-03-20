@@ -66,11 +66,18 @@ button {
 </div>
 
 <script>
+function playClick() {
+  const sound = document.getElementById("clickSound");
+  if (!sound) return;
+
+  sound.currentTime = 0;
+  sound.play();
+}
 const mode = localStorage.getItem("challengeMode");
 
 /* LETTER BUTTON */
 function goLetter() {
-
+playClick();
     if (mode === "single") {
         // Single → direct
 window.location.replace("single.html");
@@ -85,7 +92,7 @@ window.location.replace("single.html");
 
 /* VIDEO BUTTON */
 function goVideo() {
-
+playClick();
     if (mode === "single") {
         // Single → direct
         window.location.replace("single-video.html");
@@ -97,5 +104,6 @@ function goVideo() {
     }
 }
 </script>
+<audio id="clickSound" src="click.mp3"></audio>
 </body>
 </html>
