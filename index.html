@@ -176,7 +176,7 @@ const unlockTime = Number(localStorage.getItem("unlockTime"));
 
 /* GOALS BUTTON */
 goalsBtn.onclick = function () {
-playClick();
+
     if (!unlockTime || unlockTime <= 0) {
 
         // blink effect
@@ -203,7 +203,7 @@ playClick();
 
 /* SINGLE BUTTON */
 singleBtn.onclick = function () {
-playClick();
+
     document.getElementById("loader").style.display="flex";
 
     localStorage.setItem("challengeMode", "single");
@@ -217,7 +217,7 @@ playClick();
 
 /* GROUP BUTTON */
 groupBtn.onclick = function () {
-playClick();
+
     document.getElementById("loader").style.display="flex";
 
     localStorage.setItem("challengeMode", "group");
