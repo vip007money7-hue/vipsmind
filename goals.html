@@ -116,12 +116,19 @@ if (!mode) {
             "<br>Your challenge unlocked<br><br>" +
             "Challenge Locked At: " + format(lock) +
             "<br><br>" +
-            "<button onclick='startViewing()'>Start Viewing</button>";
+            "<button onclick='playClick(); startViewing()'>Start Viewing</button>";
     }
 };
 
 function startViewing() {
     window.location.href = "view.html";
+}
+function playClick() {
+  const sound = document.getElementById("clickSound");
+  if (!sound) return;
+
+  sound.currentTime = 0;
+  sound.play();
 }
 </script>
 
@@ -163,5 +170,6 @@ function drawStars(){
 drawStars();
 </script>
 </script>
+<audio id="clickSound" src="click.mp3"></audio>
 </body>
 </html>
