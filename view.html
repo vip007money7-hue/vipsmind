@@ -112,78 +112,16 @@ else if (mode === "single-video") {
 
                 const videoURL = URL.createObjectURL(result.blob);
 
-         showStartScreen(name, function () {
+                showStartScreen(name, function () {
 
-    container.innerHTML =
-        "<h2>Dear " + name + "</h2>" +
-        "<div class='card'>" +
-    "<video id='myVideo' src='" + videoURL + "'></video>" +
-
-        "<div class='controls'>" +
-        "<span id='currentTime'>0:00</span>" +
-        "<input type='range' id='seekBar' value='0'>" +
-        "<span id='duration'>0:00</span>" +
-       "</div>" +
-"</div>";
-
-    // ✅ MOVE HERE
-    setTimeout(() => {
-
-        const video = document.getElementById("myVideo");
-        const seekBar = document.getElementById("seekBar");
-        const currentTime = document.getElementById("currentTime");
-        const duration = document.getElementById("duration");
-
-        if (!video) return;
-
-        function formatTime(time) {
-            const mins = Math.floor(time / 60);
-            const secs = Math.floor(time % 60);
-            return mins + ":" + (secs < 10 ? "0" : "") + secs;
-        }
-
-        video.addEventListener("loadedmetadata", () => {
-            seekBar.max = video.duration || 0;
-            duration.textContent = formatTime(video.duration || 0);
-        });
-
-        video.addEventListener("timeupdate", () => {
-            seekBar.value = video.currentTime || 0;
-            currentTime.textContent = formatTime(video.currentTime || 0);
-        });
-
-        seekBar.addEventListener("input", () => {
-            video.currentTime = seekBar.value;
-        });
-video.onended = function () {
-    showCompletionScreen();
-};
-        let lastTap = 0;
-
-        video.addEventListener("click", function (e) {
-
-            const now = new Date().getTime();
-            const diff = now - lastTap;
-
-            if (diff < 300 && diff > 0) {
-
-                const rect = video.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-
-                if (clickX < rect.width / 2) {
-                    video.currentTime = Math.max(0, video.currentTime - 10);
-                } else {
-                    video.currentTime = Math.min(video.duration, video.currentTime + 10);
-                }
-            }
-
-            lastTap = now;
-        });
-
-    }, 300);
-
-});
-            };           
+                    container.innerHTML =
+                        "<h2>Dear " + name + "</h2>" +
+                        "<div class='card'>" +
+                        "<video src='" + videoURL + "' controls></video>" +
+                       "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
+                        "</div>";
+                });
+            };
         };
     }
 }
@@ -238,7 +176,6 @@ else if (mode === "group-write") {
     }
 }
 
-
 /* ================= GROUP VIDEO ================= */
 
 else if (mode === "group-video") {
@@ -287,61 +224,21 @@ else if (mode === "group-video") {
                         "<h2>" + (currentIndex + 1) + " of " + videos.length + "</h2>" +
                         "<h3>" + person.name + "</h3>" +
                         "<div class='card'>" +
-
-                        "<video id='myVideo' src='" + videoURL + "' controls></video>" +
-
-                        "<div class='controls'>" +
-                        "<span id='currentTime'>0:00</span>" +
-                        "<input type='range' id='seekBar' value='0'>" +
-                        "<span id='duration'>0:00</span>" +
-                        "</div>" +
-
+                        "<video id='myVideo' src='" + videoURL + "'></video>" +
                         "<button id='playBtn'>▶️ Start Video</button>" +
                         "<button id='nextBtn' style='display:none;'></button>" +
+                        "</div>";
 
-                        "</div>"
-
-                    // ===== ELEMENTS =====
                     const video = document.getElementById("myVideo");
                     const playBtn = document.getElementById("playBtn");
                     const nextBtn = document.getElementById("nextBtn");
 
-                    const seekBar = document.getElementById("seekBar");
-                    const currentTime = document.getElementById("currentTime");
-                    const duration = document.getElementById("duration");
-
-                    // ===== TIME FORMAT =====
-                    function formatTime(time) {
-                        const mins = Math.floor(time / 60);
-                        const secs = Math.floor(time % 60);
-                        return mins + ":" + (secs < 10 ? "0" : "") + secs;
-                    }
-
-                    // ===== LOAD DURATION =====
-                    video.addEventListener("loadedmetadata", () => {
-                        seekBar.max = video.duration || 0;
-                        duration.textContent = formatTime(video.duration || 0);
-                    });
-
-                    // ===== UPDATE TIME =====
-                    video.addEventListener("timeupdate", () => {
-                        seekBar.value = video.currentTime || 0;
-                        currentTime.textContent = formatTime(video.currentTime || 0);
-                    });
-
-                    // ===== SEEK =====
-                    seekBar.addEventListener("input", () => {
-                        video.currentTime = seekBar.value;
-                    });
-
-                    // ===== PLAY BUTTON =====
                     playBtn.onclick = function () {
                         video.requestFullscreen();
                         video.play();
                         playBtn.style.display = "none";
                     };
 
-                    // ===== VIDEO END =====
                     video.onended = function () {
 
                         playBtn.innerText = "Replay";
@@ -355,39 +252,14 @@ else if (mode === "group-video") {
                         nextBtn.style.display = "inline-block";
                     };
 
-                    // ===== NEXT BUTTON =====
                     nextBtn.onclick = function () {
                         if (currentIndex === videos.length - 1) {
-                            showCompletionScreen();
+                       showCompletionScreen();
                         } else {
                             currentIndex++;
                             showVideo();
                         }
                     };
-
-                    // ===== DOUBLE TAP (PRO FEATURE) =====
-                    let lastTap = 0;
-
-                    video.addEventListener("click", function (e) {
-
-                        const now = new Date().getTime();
-                        const diff = now - lastTap;
-
-                        if (diff < 300 && diff > 0) {
-
-                            const rect = video.getBoundingClientRect();
-                            const clickX = e.clientX - rect.left;
-
-                            if (clickX < rect.width / 2) {
-                                video.currentTime = Math.max(0, video.currentTime - 10);
-                            } else {
-                                video.currentTime = Math.min(video.duration, video.currentTime + 10);
-                            }
-                        }
-
-                        lastTap = now;
-                    });
-
                 };
             }
 
@@ -650,4 +522,4 @@ function shareContent() {
 }
 </script>
 </body>
-    </html>
+</html>
