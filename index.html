@@ -279,35 +279,62 @@ const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-window.addEventListener("resize",()=>{
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-drawStars();
-});
-const stars = [];
 
-for (let i = 0; i < 200; i++) {
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+//  NORMAL STARS
+const stars = [];
+for (let i = 0; i < 180; i++) {
     stars.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        radius: Math.random() * 1.5
+        radius: Math.random() * 1.2 + 0.2,
+       speed: Math.random() * 0.10 + 0.02
     });
 }
 
+//  DRAW FUNCTION
 function drawStars() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ctx.fillStyle = "white";
 
+    //  draw normal stars
     stars.forEach(star => {
+
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.shadowBlur = 2;
+        ctx.shadowColor = "white";
         ctx.fill();
+
+        // movement
+        star.x += star.speed;
+        star.y -= star.speed;
+
+        if (star.y < 0 || star.x > canvas.width) {
+            star.x = Math.random() * canvas.width;
+            star.y = canvas.height;
+        }
     });
+
+    ctx.shadowBlur = 0;
+
+    }
+
+
+//  ANIMATION LOOP
+function animate() {
+    drawStars();
+    requestAnimationFrame(animate);
 }
 
-drawStars();
+animate();
 
+animate();
 function playClick() {
   const sound = document.getElementById("clickSound");
   if (!sound) return;
