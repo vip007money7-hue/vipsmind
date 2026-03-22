@@ -117,9 +117,70 @@ else if (mode === "single-video") {
                     container.innerHTML =
                         "<h2>Dear " + name + "</h2>" +
                         "<div class='card'>" +
-                        "<video src='" + videoURL + "' controls></video>" +
-                       "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
+                    "<video id='myVideo' src='" + videoURL + "'></video>" +
+
+"<div class='controls'>" +
+"<span id='currentTime'>0:00</span>" +
+"<input type='range' id='seekBar' value='0'>" +
+"<span id='duration'>0:00</span>" +
+"</div>" +
+
+"<button id='backBtn'>⏪ 10s</button>" +
+"<button id='playBtn'>▶️ Play</button>" +
+"<button id='forwardBtn'>⏩ 10s</button>" +
                         "</div>";
+                        const video = document.getElementById("myVideo");
+const seekBar = document.getElementById("seekBar");
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
+const backBtn = document.getElementById("backBtn");
+const playBtn = document.getElementById("playBtn");
+const forwardBtn = document.getElementById("forwardBtn");
+
+// format time mm:ss
+function formatTime(time) {
+    const m = Math.floor(time / 60);
+    const s = Math.floor(time % 60);
+    return m + ":" + (s < 10 ? "0" : "") + s;
+}
+
+// set total duration
+video.onloadedmetadata = function () {
+    durationEl.innerText = formatTime(video.duration);
+    seekBar.max = video.duration;
+};
+
+// update current time + slider
+video.ontimeupdate = function () {
+    currentTimeEl.innerText = formatTime(video.currentTime);
+    seekBar.value = video.currentTime;
+};
+
+// seek manually
+seekBar.oninput = function () {
+    video.currentTime = seekBar.value;
+};
+
+// play / pause toggle
+playBtn.onclick = function () {
+    if (video.paused) {
+        video.play();
+        playBtn.innerText = "⏸ Pause";
+    } else {
+        video.pause();
+        playBtn.innerText = "▶️ Play";
+    }
+};
+
+// 10s back
+backBtn.onclick = function () {
+    video.currentTime = Math.max(0, video.currentTime - 10);
+};
+
+// 10s forward
+forwardBtn.onclick = function () {
+    video.currentTime = Math.min(video.duration, video.currentTime + 10);
+};
                 });
             };
         };
