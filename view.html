@@ -117,72 +117,70 @@ else if (mode === "single-video") {
                     container.innerHTML =
                         "<h2>Dear " + name + "</h2>" +
                         "<div class='card'>" +
-                    "<video id='myVideo' src='" + videoURL + "'></video>" +
+  "<video id='myVideo' src='" + videoURL + "' controls></video>" +
 
 "<div class='controls'>" +
 "<span id='currentTime'>0:00</span>" +
 "<input type='range' id='seekBar' value='0'>" +
 "<span id='duration'>0:00</span>" +
-"</div>" +
+"</div>";
+});
+setTimeout(() => {
 
-"<button id='backBtn'>⏪ 10s</button>" +
-"<button id='playBtn'>▶️ Play</button>" +
-"<button id='forwardBtn'>⏩ 10s</button>" +
-                        "</div>";
-                        const video = document.getElementById("myVideo");
-const seekBar = document.getElementById("seekBar");
-const currentTimeEl = document.getElementById("currentTime");
-const durationEl = document.getElementById("duration");
-const backBtn = document.getElementById("backBtn");
-const playBtn = document.getElementById("playBtn");
-const forwardBtn = document.getElementById("forwardBtn");
+    const video = document.getElementById("myVideo");
+    const seekBar = document.getElementById("seekBar");
+    const currentTime = document.getElementById("currentTime");
+    const duration = document.getElementById("duration");
 
-// format time mm:ss
-function formatTime(time) {
-    const m = Math.floor(time / 60);
-    const s = Math.floor(time % 60);
-    return m + ":" + (s < 10 ? "0" : "") + s;
-}
+    if (!video) return;
 
-// set total duration
-video.onloadedmetadata = function () {
-    durationEl.innerText = formatTime(video.duration);
-    seekBar.max = video.duration;
-};
-
-// update current time + slider
-video.ontimeupdate = function () {
-    currentTimeEl.innerText = formatTime(video.currentTime);
-    seekBar.value = video.currentTime;
-};
-
-// seek manually
-seekBar.oninput = function () {
-    video.currentTime = seekBar.value;
-};
-
-// play / pause toggle
-playBtn.onclick = function () {
-    if (video.paused) {
-        video.play();
-        playBtn.innerText = "⏸ Pause";
-    } else {
-        video.pause();
-        playBtn.innerText = "▶️ Play";
+    function formatTime(time) {
+        const mins = Math.floor(time / 60);
+        const secs = Math.floor(time % 60);
+        return mins + ":" + (secs < 10 ? "0" : "") + secs;
     }
-};
 
-// 10s back
-backBtn.onclick = function () {
-    video.currentTime = Math.max(0, video.currentTime - 10);
-};
+    video.addEventListener("loadedmetadata", () => {
+        seekBar.max = video.duration || 0;
+        duration.textContent = formatTime(video.duration || 0);
+    });
 
-// 10s forward
-forwardBtn.onclick = function () {
-    video.currentTime = Math.min(video.duration, video.currentTime + 10);
-};
-                });
-            };
+    video.addEventListener("timeupdate", () => {
+        seekBar.value = video.currentTime || 0;
+        currentTime.textContent = formatTime(video.currentTime || 0);
+    });
+
+    // ✅ smooth dragging
+    seekBar.addEventListener("input", () => {
+        video.currentTime = seekBar.value;
+    });
+
+    // 🔥 DOUBLE TAP LOGIC (MOVE HERE)
+    let lastTap = 0;
+
+    video.addEventListener("click", function (e) {
+
+        const currentTimeNow = new Date().getTime();
+        const tapLength = currentTimeNow - lastTap;
+
+        if (tapLength < 300 && tapLength > 0) {
+
+            const rect = video.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+
+            if (clickX < rect.width / 2) {
+                video.currentTime = Math.max(0, video.currentTime - 10);
+            } else {
+                video.currentTime = Math.min(video.duration, video.currentTime + 10);
+            }
+        }
+
+        lastTap = currentTimeNow;
+    });
+
+}, 300);
+});
+            };           
         };
     }
 }
