@@ -117,13 +117,14 @@ else if (mode === "single-video") {
     container.innerHTML =
         "<h2>Dear " + name + "</h2>" +
         "<div class='card'>" +
-        "<video id='myVideo' src='" + videoURL + "' controls></video>" +
+    "<video id='myVideo' src='" + videoURL + "'></video>" +
 
         "<div class='controls'>" +
         "<span id='currentTime'>0:00</span>" +
         "<input type='range' id='seekBar' value='0'>" +
         "<span id='duration'>0:00</span>" +
-        "</div>";
+       "</div>" +
+"</div>";
 
     // ✅ MOVE HERE
     setTimeout(() => {
@@ -154,7 +155,9 @@ else if (mode === "single-video") {
         seekBar.addEventListener("input", () => {
             video.currentTime = seekBar.value;
         });
-
+video.onended = function () {
+    showCompletionScreen();
+};
         let lastTap = 0;
 
         video.addEventListener("click", function (e) {
@@ -296,7 +299,7 @@ else if (mode === "group-video") {
                         "<button id='playBtn'>▶️ Start Video</button>" +
                         "<button id='nextBtn' style='display:none;'></button>" +
 
-                        "</div>";
+                        "</div>"
 
                     // ===== ELEMENTS =====
                     const video = document.getElementById("myVideo");
