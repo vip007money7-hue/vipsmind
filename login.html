@@ -110,11 +110,12 @@ animation:spin 1s linear infinite;
 </style>
 
 <script>
-// ✅ INTRO CHECK (ADD THIS)
+//  INTRO CHECK (ADD THIS)
 if(!localStorage.getItem("seenIntro")){
-    window.location.replace("intro.html");
+   if (performance.getEntriesByType("navigation")[0].type !== "back_forward")
+        window.location.replace("intro.html");
+    }
 }
-
 /* ðŸ”¥ AUTO REDIRECT IF ALREADY LOGGED */
 if(localStorage.getItem("userEmail")){
 document.addEventListener("DOMContentLoaded",()=>{
