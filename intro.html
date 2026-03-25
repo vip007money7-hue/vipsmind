@@ -162,9 +162,12 @@ window.location.replace("login.html");
 }
 /* NO  EXIT */
 function exitSite(){
-window.location.href = "about:blank";
+    if (window.history.length > 1) {
+        history.back();
+    } else {
+        window.location.replace("about:blank");
+    }
 }
-
 </script>
 
 </body>
