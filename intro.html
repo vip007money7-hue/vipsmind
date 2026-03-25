@@ -162,6 +162,8 @@ window.location.replace("login.html");
 }
 /* NO  EXIT */
 function exitSite(){
+    sessionStorage.setItem("exitPressed","yes");
+
     if (window.history.length > 1) {
         history.back();
     } else {
