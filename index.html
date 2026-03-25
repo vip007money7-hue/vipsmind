@@ -165,9 +165,10 @@ animation:spin 1s linear infinite;
    <div class="timer" id="timer"></div>
  </div>
  <script>
-if (sessionStorage.getItem("exitPressed")) {
-    history.back();
-} else {
+ if (sessionStorage.getItem("exitPressed")) {
+    sessionStorage.removeItem("exitPressed");
+}
+if (!sessionStorage.getItem("exitPressed")) {
     window.history.pushState(null, null, window.location.href);
 
     window.addEventListener("popstate", function () {
