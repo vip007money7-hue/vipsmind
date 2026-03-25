@@ -125,7 +125,7 @@ opacity:0.9;
 </div>
 
 <script>
-if(localStorage.getItem("seenIntro")){
+if(localStorage.getItem("seenIntro") && !sessionStorage.getItem("exitPressed")){
     window.location.replace("login.html");
 }
 
@@ -167,7 +167,7 @@ function exitSite(){
     if (window.history.length > 1) {
         history.back();
     } else {
-        window.location.replace("about:blank");
+        window.location.href = "about:blank";
     }
 }
 </script>
