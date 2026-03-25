@@ -112,16 +112,14 @@ animation:spin 1s linear infinite;
 <script>
 //  INTRO CHECK (ADD THIS)
 if(!localStorage.getItem("seenIntro")){
-   if (performance.getEntriesByType("navigation")[0].type !== "back_forward")
-        window.location.replace("intro.html");
-    }
+    window.location.replace("intro.html");
 }
 /* ðŸ”¥ AUTO REDIRECT IF ALREADY LOGGED */
 if(localStorage.getItem("userEmail")){
 document.addEventListener("DOMContentLoaded",()=>{
 document.getElementById("loader").style.display="flex";
 setTimeout(()=>{
-window.location.href="index.html";
+window.location.replace("index.html");
 },800);
 });
 }
@@ -189,7 +187,7 @@ signInWithEmailAndPassword(auth,email,password)
 localStorage.setItem("userEmail",userCredential.user.email);
 document.getElementById("loader").style.display="flex";
 setTimeout(()=>{
-window.location.href="index.html";
+window.location.replace("index.html");
 },800);
 
 })
@@ -201,7 +199,7 @@ createUserWithEmailAndPassword(auth,email,password)
 localStorage.setItem("userEmail",userCredential.user.email);
 document.getElementById("loader").style.display="flex";
 setTimeout(()=>{
-window.location.href="index.html";
+window.location.replace("index.html");
 },800);
 
 })
@@ -221,7 +219,7 @@ signInWithPopup(auth, provider)
 localStorage.setItem("userEmail", result.user.email);
 document.getElementById("loader").style.display="flex";
 setTimeout(()=>{
-window.location.href="index.html";
+window.location.replace("index.html");
 },800);
 
 })
