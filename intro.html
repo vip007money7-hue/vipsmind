@@ -107,7 +107,7 @@ opacity:0.9;
 
 <!-- VIP IMAGE -->
 <div class="vip">
-<img src="./vip.png.jpg">
+<img src="./vip.png">
 </div>
 
 <!-- SPEECH -->
@@ -125,12 +125,9 @@ opacity:0.9;
 </div>
 
 <script>
-if(localStorage.getItem("seenIntro")){
-    window.location.replace("login.html");
-}
 
 const message =
-"Hi Mr/Miss,\n\n"+
+"Hi Mr/Miss \n\n"+
 "I am Vip.\n\n"+
 "I will guide you through the VipsMind website.\n\n"+
 "But remember...\n\n"+
@@ -157,12 +154,13 @@ typeText();
 
 /* YES  LOGIN */
 function enter(){
-localStorage.setItem("seenIntro","yes");
-window.location.replace("login.html");
+window.location.href = "login.html";
 }
+
 /* NO  EXIT */
 function exitSite(){
-window.location.href = "about:blank";
+window.open('', '_self');
+window.close();
 }
 
 </script>
