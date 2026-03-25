@@ -165,8 +165,10 @@ animation:spin 1s linear infinite;
    <div class="timer" id="timer"></div>
  </div>
  <script>
+window.history.pushState(null, null, window.location.href);
+
 window.addEventListener("popstate", function () {
-    history.back();
+    window.history.pushState(null, null, window.location.href);
 });
 
 const timerEl = document.getElementById("timer");
@@ -370,9 +372,9 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
 onAuthStateChanged(auth, (user) => {
-  if (!user) {
+  if (!localStorage.getItem("userEmail")) {
     window.location.replace("login.html");
-  }
+}
 
 });
 
