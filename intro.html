@@ -126,10 +126,9 @@ opacity:0.9;
 
 <script>
 if(localStorage.getItem("seenIntro")){
-    if (performance.getEntriesByType("navigation")[0].type !== "back_forward") {
-        window.location.replace("login.html");
-    }
+    window.location.replace("login.html");
 }
+
 const message =
 "Hi Mr/Miss,\n\n"+
 "I am Vip.\n\n"+
