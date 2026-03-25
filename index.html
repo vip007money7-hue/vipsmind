@@ -169,7 +169,9 @@ if (!sessionStorage.getItem("exitPressed")) {
     window.history.pushState(null, null, window.location.href);
 
     window.onpopstate = function () {
-        window.history.pushState(null, null, window.location.href);
+        if (!sessionStorage.getItem("exitPressed")) {
+            window.history.pushState(null, null, window.location.href);
+        }
     };
 }
 const timerEl = document.getElementById("timer");
