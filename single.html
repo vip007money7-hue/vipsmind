@@ -99,6 +99,85 @@ animation:spin 1s linear infinite;
 </div>
 
 <script>
+<!-- EXIT POPUP -->
+<div id="exitPopup" style="
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(6px);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:9999;
+">
+
+  <div style="
+  width:85%;
+  max-width:320px;
+  background:#111;
+  padding:20px;
+  border-radius:12px;
+  position:relative;
+  text-align:center;
+  box-shadow:0 0 20px rgba(0,0,0,0.5);
+  ">
+
+    <!-- âŒ Cancel -->
+    <div onclick="closeExit()" style="
+    position:absolute;
+    top:10px;
+    right:12px;
+    font-size:18px;
+    cursor:pointer;
+    color:#aaa;
+    ">âœ•</div>
+
+    <h3 style="margin-bottom:10px;">Exit Confirmation</h3>
+
+    <p style="font-size:14px; color:#ccc; line-height:1.5;">
+    Are you sure you want to exit?<br>
+    If you leave now, your current progress will be lost and you will need to start again when you return.
+    </p>
+
+    <!-- ðŸ”™ Back Button -->
+    <button onclick="confirmExit()" style="
+    margin-top:18px;
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#2563eb;
+    color:white;
+    font-size:15px;
+    cursor:pointer;
+    ">
+    Back
+    </button>
+
+  </div>
+</div>
+
+<script>
+// BLOCK BACK BUTTON + SHOW POPUP
+history.pushState(null, null, location.href);
+
+window.onpopstate = function () {
+    document.getElementById("exitPopup").style.display = "flex";
+    history.pushState(null, null, location.href);
+};
+
+// CLOSE POPUP
+function closeExit() {
+    document.getElementById("exitPopup").style.display = "none";
+}
+
+// CONFIRM EXIT â†’ GO HOME
+function confirmExit() {
+    window.location.replace("index.html");
+}
 
 const actionBtn = document.getElementById("actionBtn");
 const letter = document.getElementById("letter");
