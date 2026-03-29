@@ -165,6 +165,8 @@ animation:spin 1s linear infinite;
    <div class="timer" id="timer"></div>
  </div>
  <script>
+
+
 const timerEl = document.getElementById("timer");
 const singleBtn = document.getElementById("singleBtn");
 const groupBtn = document.getElementById("groupBtn");
@@ -366,16 +368,14 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
 onAuthStateChanged(auth, (user) => {
-  if (!localStorage.getItem("userEmail")) {
+  if (!user) {
     window.location.replace("login.html");
-}
+  }
 
 });
 
-window.addEventListener("pageshow", function (event) {
-    if (event.persisted) {
-        document.getElementById("loader").style.display = "none";
-    }
+window.addEventListener("pageshow", function () {
+    document.getElementById("loader").style.display = "none";
 });
    
 
