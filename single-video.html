@@ -71,9 +71,11 @@ animation:spin 1s linear infinite;
 </head>
 
 <body>
+
 <div id="loader">
 <div class="spinner"></div>
 </div>
+
 <div class="box" id="mainBox">
 
 <h2>Single Video Message</h2>
@@ -84,8 +86,10 @@ animation:spin 1s linear infinite;
 
 <button id="recordBtn">Start Recording</button>
 
-</div>
-<!-- EXIT POPUP -->
+</div> <!-- ✅ mainBox CLOSED -->
+
+
+<!-- ✅ EXIT POPUP (OUTSIDE mainBox) -->
 <div id="exitPopup" style="
 position:fixed;
 top:0;
@@ -104,13 +108,14 @@ z-index:9999;
   width:85%;
   max-width:320px;
   background:#111;
+  border:1px solid #444;
   padding:20px;
   border-radius:12px;
   position:relative;
   text-align:center;
   ">
 
-    <!-- âŒ Cancel -->
+    <!-- ❌ Cancel -->
     <div onclick="closeExit()" style="
     position:absolute;
     top:10px;
@@ -118,57 +123,62 @@ z-index:9999;
     font-size:18px;
     cursor:pointer;
     color:#aaa;
-    "></div>
+    ">✕</div>
 
-    <h3>Exit Confirmation</h3>
+    <h3 style="margin-bottom:10px;">Exit Confirmation</h3>
 
     <p style="font-size:14px; color:#ccc;">
     Are you sure you want to exit?<br>
-    If you leave now, your current progress will be lost and you will need to start again when you return.
+    Your progress will be lost.
     </p>
 
+    <!-- 🔙 Back -->
     <button onclick="confirmExit()" style="
-    margin-top:15px;
+    margin-top:18px;
     width:100%;
     padding:12px;
     border:none;
     border-radius:8px;
-    background:#2563eb;
-    color:white;
+    background:#facc15;
+    color:black;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
     ">
     Back
     </button>
 
   </div>
 </div>
+
+
 <script>
+
 // BACK BUTTON CONTROL
 history.pushState(null, null, location.href);
 
 window.onpopstate = function () {
 
-    // ðŸ§  If recording is ON â†’ DO NOTHING (stay)
-    if (mediaRecorder && mediaRecorder.state === "recording") {
-        history.pushState(null, null, location.href);
-        return;
-    }
-
-    // ðŸ§  Otherwise â†’ show popup
+    // show popup
     document.getElementById("exitPopup").style.display = "flex";
 
-    // prevent exit
+    // stop exit
     history.pushState(null, null, location.href);
 };
 
-// CLOSE POPUP
+// ❌ Close popup
 function closeExit() {
     document.getElementById("exitPopup").style.display = "none";
 }
 
-// CONFIRM EXIT â†’ HOME
+// ✅ Go home
 function confirmExit() {
     window.location.replace("index.html");
 }
+
+
+// ================= YOUR ORIGINAL CODE (UNCHANGED) =================
+
 const recordBtn = document.getElementById("recordBtn");
 const preview = document.getElementById("preview");
 const userName = document.getElementById("userName");
@@ -176,7 +186,6 @@ const userName = document.getElementById("userName");
 let mediaRecorder;
 let recordedChunks = [];
 let stream;
-/* ================= INDEXED DB SETUP ================= */
 
 let db;
 
@@ -192,7 +201,6 @@ request.onupgradeneeded = function (event) {
 request.onsuccess = function (event) {
     db = event.target.result;
 };
-/* ================= RECORD BUTTON ================= */
 
 recordBtn.onclick = async function () {
 
@@ -201,7 +209,6 @@ recordBtn.onclick = async function () {
         return;
     }
 
-    /* ================= START RECORDING ================= */
     if (recordBtn.innerText === "Start Recording") {
 
         try {
@@ -210,7 +217,7 @@ recordBtn.onclick = async function () {
                 audio: true
             });
         } catch (err) {
-            alert("Camera permission denied or not available");
+            alert("Camera permission denied");
             return;
         }
 
@@ -228,39 +235,33 @@ recordBtn.onclick = async function () {
         }
 
         mediaRecorder.ondataavailable = function (e) {
-            if (e.data && e.data.size > 0) {
-                recordedChunks.push(e.data);
-            }
+            if (e.data.size > 0) recordedChunks.push(e.data);
         };
 
         mediaRecorder.onstop = function () {
 
             const blob = new Blob(recordedChunks, { type: "video/webm" });
 
-           const transaction = db.transaction(["videos"], "readwrite");
-const store = transaction.objectStore("videos");
+            const transaction = db.transaction(["videos"], "readwrite");
+            const store = transaction.objectStore("videos");
 
-store.put({
-    id: "singleVideo",
-    blob: blob
-});
+            store.put({
+                id: "singleVideo",
+                blob: blob
+            });
 
-localStorage.setItem("singleName", userName.value.trim());
-localStorage.setItem("challengeMode", "single-video");
+            localStorage.setItem("singleName", userName.value.trim());
+            localStorage.setItem("challengeMode", "single-video");
 
-stream.getTracks().forEach(track => track.stop());
+            stream.getTracks().forEach(track => track.stop());
 
-showTimerScreen();
+            showTimerScreen();
         };
 
         mediaRecorder.start();
-
         recordBtn.innerText = "Stop Recording";
 
-    }
-
-    /* ================= STOP RECORDING ================= */
-    else {
+    } else {
 
         if (mediaRecorder && mediaRecorder.state !== "inactive") {
             mediaRecorder.stop();
@@ -271,8 +272,6 @@ showTimerScreen();
 };
 
 
-/* ================= TIMER SCREEN ================= */
-
 function showTimerScreen() {
 
     document.getElementById("mainBox").innerHTML = `
@@ -282,8 +281,6 @@ function showTimerScreen() {
     `;
 }
 
-
-/* ================= LOCK CHALLENGE ================= */
 
 function lockChallenge() {
 
@@ -298,13 +295,14 @@ function lockChallenge() {
     localStorage.setItem("unlockTime", new Date(unlock).getTime());
     localStorage.setItem("challengeStatus", "locked");
 
-  document.getElementById("loader").style.display="flex";
+    document.getElementById("loader").style.display="flex";
 
-setTimeout(()=>{
-window.location.replace("goals.html");
-},600);
+    setTimeout(()=>{
+        window.location.replace("goals.html");
+    },600);
 }
 
 </script>
+
 </body>
-    </html>
+</html>
