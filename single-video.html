@@ -149,7 +149,6 @@ z-index:9999;
 <script>
 
 // âœ… ADDED BACK BUTTON CONTROL (ONLY ADDITION)
-history.pushState({ page: "single" }, "", location.href);
 window.onpopstate = function () {
     document.getElementById("exitPopup").style.display = "flex";
 
@@ -157,9 +156,9 @@ window.onpopstate = function () {
     history.pushState({ page: "single" }, "", location.href);
 };
 
-function closeExit() {
-    document.getElementById("exitPopup").style.display = "none";
-}
+window.onpopstate = function () {
+    window.location.replace("index.html");
+};
 
 function confirmExit() {
     sessionStorage.setItem("exitPressed", "true");
