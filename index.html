@@ -166,8 +166,10 @@ animation:spin 1s linear infinite;
  </div>
  <script>
  // BACK BUTTON = EXIT APP
+history.pushState(null, null, location.href);
+
 window.onpopstate = function () {
-    window.close();
+    // allow app to exit (no redirect)
 };
 const timerEl = document.getElementById("timer");
 const singleBtn = document.getElementById("singleBtn");
