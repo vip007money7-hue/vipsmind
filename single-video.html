@@ -148,24 +148,26 @@ z-index:9999;
 
 <script>
 
-// âœ… ADDED BACK BUTTON CONTROL (ONLY ADDITION)
-history.pushState({ page: "single" }, "", location.href);
+// FIXED BACK CONTROL
+
+//  ADD THIS LINE (VERY IMPORTANT)
+history.pushState(null, null, location.href);
 
 window.onpopstate = function () {
     document.getElementById("exitPopup").style.display = "flex";
-};
 
+    // keep blocking back
+    history.pushState(null, null, location.href);
+};
 
 
 function confirmExit() {
     sessionStorage.setItem("exitPressed", "true");
-    window.location.replace("index.html");
+   window.location.replace("index.html");
 }
 function closeExit() {
     document.getElementById("exitPopup").style.display = "none";
 
-    // keep back button working again
-    history.pushState({ page: "single" }, "", location.href);
 }
 
 // ðŸ”¥ YOUR ORIGINAL CODE (UNCHANGED BELOW)
