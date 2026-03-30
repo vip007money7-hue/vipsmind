@@ -135,14 +135,8 @@ function playClick() {
 <script>
 history.pushState(null, null, location.href);
 
-// 🔥 CUT PREVIOUS PAGE (IMPORTANT)
-history.replaceState(null, null, location.href);
-
-// 🔥 ADD NEW STATE
-history.pushState(null, null, location.href);
-
 window.onpopstate = function () {
-    window.location.replace("index.html");
+    window.location.href = "index.html";
 };
 </script>
 <script>
