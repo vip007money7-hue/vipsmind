@@ -123,14 +123,6 @@ window.location.replace("index.html");
 },800);
 });
 }
-//  BLOCK BACK IF LOCKED (SAFE ADD)
-if (localStorage.getItem("challengeStatus") === "locked") {
-    history.pushState(null, null, location.href);
-
-    window.onpopstate = function () {
-        history.pushState(null, null, location.href);
-    };
-}
 </script>
 </head>
 
