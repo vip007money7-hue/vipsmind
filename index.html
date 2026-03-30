@@ -171,6 +171,9 @@ history.pushState(null, null, location.href);
 window.onpopstate = function () {
     // allow app to exit (no redirect)
 };
+if (localStorage.getItem("challengeStatus") === "locked") {
+    history.pushState(null, null, location.href);
+}
 const timerEl = document.getElementById("timer");
 const singleBtn = document.getElementById("singleBtn");
 const groupBtn = document.getElementById("groupBtn");
