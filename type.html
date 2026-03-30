@@ -74,7 +74,7 @@ function playClick() {
   sound.play();
 }
 const mode = localStorage.getItem("challengeMode");
-
+history.pushState(null, null, location.href);
 /* LETTER BUTTON */
 function goLetter() {
 playClick();
