@@ -149,22 +149,24 @@ z-index:9999;
 <script>
 
 // âœ… ADDED BACK BUTTON CONTROL (ONLY ADDITION)
+history.pushState({ page: "single" }, "", location.href);
+
 window.onpopstate = function () {
     document.getElementById("exitPopup").style.display = "flex";
-
-    // prevent immediate exit
-    history.pushState({ page: "single" }, "", location.href);
 };
 
-window.onpopstate = function () {
-    window.location.replace("index.html");
-};
+
 
 function confirmExit() {
     sessionStorage.setItem("exitPressed", "true");
     window.location.replace("index.html");
 }
+function closeExit() {
+    document.getElementById("exitPopup").style.display = "none";
 
+    // keep back button working again
+    history.pushState({ page: "single" }, "", location.href);
+}
 
 // ðŸ”¥ YOUR ORIGINAL CODE (UNCHANGED BELOW)
 
