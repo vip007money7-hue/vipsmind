@@ -166,8 +166,10 @@ animation:spin 1s linear infinite;
  </div>
  <script>
  // BACK BUTTON = EXIT APP
-history.pushState(null, null, location.href);
-
+if (sessionStorage.getItem("exitPressed")) {
+    history.replaceState(null, null, location.href);
+    sessionStorage.removeItem("exitPressed");
+}
 window.onpopstate = function () {
     // allow app to exit (no redirect)
 };
