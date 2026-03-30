@@ -154,9 +154,17 @@ z-index:9999;
 history.pushState(null, null, location.href);
 
 window.onpopstate = function () {
-    document.getElementById("exitPopup").style.display = "flex";
 
-    // keep blocking back
+    // 🔒 ONLY IF LOCKED → BLOCK BACK
+    if (localStorage.getItem("challengeStatus") === "locked") {
+        history.pushState(null, null, location.href);
+        return;
+    }
+
+    // 🟡 NORMAL FLOW → SHOW EXIT POPUP
+  const popup = document.getElementById("exitPopup");
+if (popup) popup.style.display = "flex";
+
     history.pushState(null, null, location.href);
 };
 
@@ -166,8 +174,8 @@ function confirmExit() {
    window.location.replace("index.html");
 }
 function closeExit() {
-    document.getElementById("exitPopup").style.display = "none";
-
+    const popup = document.getElementById("exitPopup");
+    if (popup) popup.style.display = "none";
 }
 
 // ðŸ”¥ YOUR ORIGINAL CODE (UNCHANGED BELOW)
