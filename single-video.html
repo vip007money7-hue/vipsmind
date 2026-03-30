@@ -119,7 +119,7 @@ z-index:9999;
     font-size:18px;
     cursor:pointer;
     color:#aaa;
-    ">✖</div>
+    "></div>
 
     <h3>Exit Confirmation</h3>
 
@@ -159,7 +159,12 @@ window.onpopstate = function () {
 
 function confirmExit() {
     sessionStorage.setItem("exitPressed", "true");
-    window.location.replace("index.html");
+    window.location.href = "index.html";
+
+// CLEAR HISTORY COMPLETELY
+setTimeout(() => {
+    history.pushState(null, "", "index.html");
+}, 100);
 }
 function closeExit() {
     document.getElementById("exitPopup").style.display = "none";
@@ -308,4 +313,4 @@ window.location.replace("goals.html");
 
 </script>
 </body>
-</html>
+    </html>
