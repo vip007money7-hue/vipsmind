@@ -40,14 +40,14 @@ body {
  /* GOALS tag */
   .goals-wrap {
   position: absolute;
-  top: 66px;        /* EXACT: 1 inch below Vip’smind */
+  top: 66px;        /* EXACT: 1 inch below Vipâ€™smind */
   left: 0;
   width: 100%;
 }
 
  .goals-tag {
   position: absolute;
-  left: 94px;     /* LEFT SIDE – FIXED */
+  left: 94px;     /* LEFT SIDE â€“ FIXED */
   top: 0;
   background: #ffffff;
   color: #000;
@@ -154,7 +154,7 @@ animation:spin 1s linear infinite;
 <div class="spinner"></div>
 </div>
 <canvas id="stars"></canvas>
-<div class="brand">Vip’smind</div>
+<div class="brand">Vipâ€™smind</div>
  <div class="message">A MESSAGE TO YOUR FUTURE SELF</div>
 <div class="goals-wrap">
    <div class="goals-tag">GOALS</div>
@@ -165,10 +165,23 @@ animation:spin 1s linear infinite;
    <div class="timer" id="timer"></div>
  </div>
  <script>
-// BACK BUTTON = CONTROLLED
-// ✅ Allow normal exit from home
+// CLEAN BACK BUTTON LOGIC - ONLY CHANGE THIS PART
+history.replaceState(null, null, location.href);
+
 window.onpopstate = function () {
-    // do nothing → browser will exit app
+    // If any challenge has been placed (locked or unlocked) → clean exit
+    if (localStorage.getItem("unlockTime") || localStorage.getItem("challengeStatus") === "locked") {
+        if (window.history.length > 1) {
+            history.back();           // one more back to clear stack
+        } else {
+            window.location.href = "about:blank";   // final clean exit
+        }
+        return;
+    }
+    
+    // No challenge yet → normal behaviour
+    sessionStorage.setItem("exitPressed", "true");
+    history.replaceState(null, null, location.href);
 };
 
 // reset exit flag when entering home normally
