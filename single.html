@@ -97,7 +97,67 @@ animation:spin 1s linear infinite;
 
   <button id="actionBtn">Continue to Timer</button>
 </div>
+<!-- EXIT POPUP -->
+<div id="exitPopup" style="
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(6px);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:9999;
+">
 
+  <div style="
+  width:85%;
+  max-width:320px;
+  background:#111;
+  border:1px solid #444;
+  padding:20px;
+  border-radius:12px;
+  position:relative;
+  text-align:center;
+  ">
+
+    <!-- ❌ Cancel -->
+    <div onclick="closeExit()" style="
+    position:absolute;
+    top:10px;
+    right:12px;
+    font-size:18px;
+    cursor:pointer;
+    color:#aaa;
+    ">✕</div>
+
+    <h3 style="margin-bottom:10px;">Exit Confirmation</h3>
+
+    <p style="font-size:14px; color:#ccc; line-height:1.5;">
+    Are you sure you want to exit?<br>
+    If you leave now, your current progress will be lost and you will need to start again when you return.
+    </p>
+
+    <!-- 🔙 Back -->
+    <button onclick="confirmExit()" style="
+    margin-top:18px;
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#facc15;
+    color:black;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    ">
+    Back
+    </button>
+
+  </div>
+</div>
 <script>
 
 const actionBtn = document.getElementById("actionBtn");
@@ -107,6 +167,38 @@ const unlock = document.getElementById("unlock");
 const title = document.getElementById("title");
 
 let step = 1;
+// 🔥 BACK BUTTON CONTROL
+history.pushState(null, null, location.href);
+
+window.onpopstate = function () {
+
+    // 👉 If user is in TIMER screen → go back to writing (NO popup)
+    if (step === 2) {
+        username.style.display = "block";
+        letter.style.display = "block";
+        unlock.style.display = "none";
+        title.innerText = "Write Your Letter";
+        actionBtn.innerText = "Continue to Timer";
+        step = 1;
+
+        history.pushState(null, null, location.href);
+        return;
+    }
+
+    // 👉 If user is in WRITING screen → show popup
+    document.getElementById("exitPopup").style.display = "flex";
+    history.pushState(null, null, location.href);
+};
+
+// ❌ Cancel button
+function closeExit() {
+    document.getElementById("exitPopup").style.display = "none";
+}
+
+// ✅ Back to Home
+function confirmExit() {
+   window.location.replace("index.html");
+}
 
 actionBtn.onclick = function () {
 
