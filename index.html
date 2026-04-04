@@ -40,14 +40,14 @@ body {
  /* GOALS tag */
   .goals-wrap {
   position: absolute;
-  top: 66px;        /* EXACT: 1 inch below Vipâ€™smind */
+  top: 66px;        /* EXACT: 1 inch below Vip’smind */
   left: 0;
   width: 100%;
 }
 
  .goals-tag {
   position: absolute;
-  left: 94px;     /* LEFT SIDE â€“ FIXED */
+  left: 94px;     /* LEFT SIDE – FIXED */
   top: 0;
   background: #ffffff;
   color: #000;
@@ -154,7 +154,7 @@ animation:spin 1s linear infinite;
 <div class="spinner"></div>
 </div>
 <canvas id="stars"></canvas>
-<div class="brand">Vipâ€™smind</div>
+<div class="brand">Vip’smind</div>
  <div class="message">A MESSAGE TO YOUR FUTURE SELF</div>
 <div class="goals-wrap">
    <div class="goals-tag">GOALS</div>
@@ -165,26 +165,28 @@ animation:spin 1s linear infinite;
    <div class="timer" id="timer"></div>
  </div>
  <script>
-// CLEAN BACK BUTTON LOGIC - ONLY CHANGE THIS PART
+// CLEAN BACK BUTTON LOGIC
 history.replaceState(null, null, location.href);
 
 window.onpopstate = function () {
-    // If any challenge has been placed (locked or unlocked) → clean exit
-    if (localStorage.getItem("unlockTime") || localStorage.getItem("challengeStatus") === "locked") {
+    const hasChallenge = localStorage.getItem("unlockTime") || localStorage.getItem("challengeStatus") === "locked";
+
+    if (hasChallenge) {
+        // Clean exit on one back press when challenge exists
         if (window.history.length > 1) {
-            history.back();           // one more back to clear stack
+            history.back();
         } else {
-            window.location.href = "about:blank";   // final clean exit
+            window.location.href = "about:blank";
         }
         return;
     }
     
-    // No challenge yet → normal behaviour
+    // No challenge yet - allow normal navigation
     sessionStorage.setItem("exitPressed", "true");
     history.replaceState(null, null, location.href);
 };
 
-// reset exit flag when entering home normally
+// reset exit flag
 sessionStorage.removeItem("exitPressed");
 
 const timerEl = document.getElementById("timer");
@@ -192,7 +194,7 @@ const singleBtn = document.getElementById("singleBtn");
 const groupBtn = document.getElementById("groupBtn");
 const goalsBtn = document.querySelector(".goals-tag");
 
-const unlockTime = Number(localStorage.getItem("unlockTime"));
+let unlockTime = Number(localStorage.getItem("unlockTime"));
 
 /* GOALS BUTTON */
 goalsBtn.onclick = function () {
@@ -250,7 +252,7 @@ playClick();
 
 
 function updateUI() {
-
+    unlockTime = Number(localStorage.getItem("unlockTime"));   // add this line
     if (!unlockTime || unlockTime <= 0) {
         timerEl.innerText = "No challenge placed";
         singleBtn.style.display = "inline-block";
