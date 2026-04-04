@@ -196,9 +196,11 @@ function closeExit() {
 }
 
 // ✅ Back to Home
+
 function confirmExit() {
-    window.location.replace("index.html");
-}
+   sessionStorage.setItem("exitPressed", "true");
+ window.location.href = "index.html";
+ }
 actionBtn.onclick = function () {
 
   if (step === 1) {
