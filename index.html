@@ -165,15 +165,14 @@ animation:spin 1s linear infinite;
    <div class="timer" id="timer"></div>
  </div>
  <script>
- // BACK BUTTON = EXIT APP
-history.pushState(null, null, location.href);
+// BACK BUTTON = EXIT APP
+
+history.replaceState(null, null, location.href);
 
 window.onpopstate = function () {
-    // allow app to exit (no redirect)
+    // block going back to previous pages
+    history.replaceState(null, null, location.href);
 };
-if (localStorage.getItem("challengeStatus") === "locked") {
-    history.pushState(null, null, location.href);
-}
 const timerEl = document.getElementById("timer");
 const singleBtn = document.getElementById("singleBtn");
 const groupBtn = document.getElementById("groupBtn");
