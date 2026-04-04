@@ -119,7 +119,7 @@ z-index:9999;
     font-size:18px;
     cursor:pointer;
     color:#aaa;
-    ">âœ•</div>
+    ">✖</div>
 
     <h3>Exit Confirmation</h3>
 
@@ -148,23 +148,33 @@ z-index:9999;
 
 <script>
 
-// âœ… ADDED BACK BUTTON CONTROL (ONLY ADDITION)
-window.onpopstate = function () {
-    document.getElementById("exitPopup").style.display = "flex";
+// FIXED BACK CONTROL
 
-    // prevent immediate exit
-    history.pushState({ page: "single" }, "", location.href);
-};
+//  ADD THIS LINE (VERY IMPORTANT)
+history.pushState(null, null, location.href);
 
 window.onpopstate = function () {
-    window.location.replace("index.html");
+
+    // 🔒 LOCKED → BLOCK BACK COMPLETELY
+    if (localStorage.getItem("challengeStatus") === "locked") {
+        history.pushState(null, null, location.href);
+        return;
+    }
+
+    // ✅ NORMAL → SHOW POPUP
+    const popup = document.getElementById("exitPopup");
+    if (popup) popup.style.display = "flex";
 };
+
 
 function confirmExit() {
     sessionStorage.setItem("exitPressed", "true");
-    window.location.replace("index.html");
+   window.location.replace("index.html");
 }
-
+function closeExit() {
+    const popup = document.getElementById("exitPopup");
+    if (popup) popup.style.display = "none";
+}
 
 // ðŸ”¥ YOUR ORIGINAL CODE (UNCHANGED BELOW)
 
@@ -248,7 +258,8 @@ localStorage.setItem("singleName", userName.value.trim());
 localStorage.setItem("challengeMode", "single-video");
 
 stream.getTracks().forEach(track => track.stop());
-
+preview.srcObject = null;
+preview.style.display = "none";
 showTimerScreen();
         };
 
