@@ -165,19 +165,24 @@ animation:spin 1s linear infinite;
    <div class="timer" id="timer"></div>
  </div>
  <script>
-// CLEAN BACK BUTTON LOGIC
+// STRONG BACK BUTTON FIX - ONE CLICK CLEAN EXIT FROM HOME
 history.replaceState(null, null, location.href);
+
+// Seal history if challenge already exists
+if (localStorage.getItem("unlockTime") || localStorage.getItem("challengeStatus") === "locked") {
+    history.replaceState(null, null, location.href);
+}
 
 window.onpopstate = function () {
     const hasChallenge = localStorage.getItem("unlockTime") || localStorage.getItem("challengeStatus") === "locked";
 
- if (hasChallenge) {
-    // Force clean exit - one click from home = exit
-    window.location.href = "about:blank";
-    return;
-}
+    if (hasChallenge) {
+        // Force clean exit - no going back to creation pages
+        window.location.href = "about:blank";
+        return;
+    }
     
-    // No challenge yet - allow normal navigation
+    // No challenge yet
     sessionStorage.setItem("exitPressed", "true");
     history.replaceState(null, null, location.href);
 };
