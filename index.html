@@ -165,14 +165,23 @@ animation:spin 1s linear infinite;
    <div class="timer" id="timer"></div>
  </div>
  <script>
-// BACK BUTTON = EXIT APP
+// BACK BUTTON = CONTROLLED
 
 history.replaceState(null, null, location.href);
 
 window.onpopstate = function () {
-    // block going back to previous pages
-    history.replaceState(null, null, location.href);
+
+    // 🚫 Only block if user came from challenge flow
+    if (sessionStorage.getItem("exitPressed") === "true") {
+        history.replaceState(null, null, location.href);
+        return;
+    }
+
+    // ✅ Otherwise allow normal back (or exit)
 };
+// reset exit flag when entering home normally
+sessionStorage.removeItem("exitPressed");
+
 const timerEl = document.getElementById("timer");
 const singleBtn = document.getElementById("singleBtn");
 const groupBtn = document.getElementById("groupBtn");
