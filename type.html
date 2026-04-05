@@ -64,7 +64,13 @@ button {
         <button class="letter" onclick="goLetter()">Letter</button>
     </div>
 </div>
+<script>
+history.pushState(null, null, location.href);
 
+window.onpopstate = function () {
+    window.location.replace("home.html");
+};
+</script>
 <script>
 function playClick() {
   const sound = document.getElementById("clickSound");
