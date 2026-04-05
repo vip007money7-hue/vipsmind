@@ -67,9 +67,10 @@ button {
 <script>
 history.pushState(null, null, location.href);
 
-window.onpopstate = function () {
-    window.location.replace("home.html");
-};
+window.addEventListener("popstate", function () {
+    history.pushState(null, null, location.href);
+    window.location.href = "index.html";
+});
 </script>
 <script>
 function playClick() {
