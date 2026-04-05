@@ -128,8 +128,17 @@ opacity:0.9;
 </div>
 
 </div>
-
+<audio id="typingSound" src="typing.mp3"></audio>
+<audio id="buttonSound" src="click.mp3"></audio>
 <script>
+const typingSound = document.getElementById("typingSound");
+const buttonSound = document.getElementById("buttonSound");
+document.body.addEventListener("click", () => {
+    typingSound.play().then(() => {
+        typingSound.pause();
+        typingSound.currentTime = 0;
+    });
+}, { once: true });
 if(localStorage.getItem("seenIntro")){
     window.location.replace("login.html");
 }
@@ -151,12 +160,21 @@ const message =
 let i = 0;
 
 function typeText(){
+
+if(i === 0){
+    typingSound.loop = true;
+    typingSound.play().catch(() => {});
+}
+
 if(i < message.length){
 document.getElementById("text").innerHTML += message.charAt(i);
 i++;
 setTimeout(typeText,28);
 }else{
 document.getElementById("buttons").style.display="block";
+
+typingSound.pause();
+typingSound.currentTime = 0;
 }
 }
 
@@ -164,8 +182,15 @@ typeText();
 
 /* YES  LOGIN */
 function enter(){
-localStorage.setItem("seenIntro","yes");
-window.location.replace("login.html");
+
+buttonSound.currentTime = 0;
+buttonSound.play().catch(() => {});
+
+buttonSound.onended = () => {
+    localStorage.setItem("seenIntro","yes");
+    window.location.replace("login.html");
+};
+
 }
 /* NO  EXIT */
 function exitSite(){
