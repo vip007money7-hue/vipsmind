@@ -133,6 +133,12 @@ opacity:0.9;
 <script>
 const typingSound = document.getElementById("typingSound");
 const clickSound = document.getElementById("clickSound");
+document.body.addEventListener("click", () => {
+    typingSound.play().then(() => {
+        typingSound.pause();
+        typingSound.currentTime = 0;
+    });
+}, { once: true });
 if(localStorage.getItem("seenIntro")){
     window.location.replace("login.html");
 }
@@ -196,4 +202,4 @@ function exitSite(){
 </script>
 
 </body>
-</html>
+    </html>
