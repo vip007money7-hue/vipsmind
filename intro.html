@@ -1,22 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>VipsMind</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-<style>
-body{
-margin:0;
-background:#000;
-font-family: "Cormorant Garamond", serif;
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-color:#fff;
-}
-
-/* layout */
+<!DOCTYPE html>  <html>  
+<head>  
+<meta charset="UTF-8">  
+<title>VipsMind</title>  
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">  
+<style>  
+body{  
+margin:0;  
+background:#000;  
+font-family: "Cormorant Garamond", serif;  
+height:100vh;  
+display:flex;  
+align-items:center;  
+justify-content:center;  
+color:#fff;  
+}  /* layout */
 
 .container{
 display:flex;
@@ -26,14 +23,14 @@ max-width:1200px;
 width:95%;
 }
 
-/* VIP image */
+/* VIP image /
 .vip img{
 width:380px;
 height:auto;
 display:block;
 filter:drop-shadow(0 0 40px black);
 }
-/* speech bubble */
+/ speech bubble */
 
 .bubble{
 background:#f5f5f5;
@@ -103,38 +100,21 @@ button:hover{
 opacity:0.9;
 }
 
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<!-- VIP IMAGE -->
-<div class="vip">
-<img src="./vip.png.jpg">
-</div>
-
-<!-- SPEECH -->
-<div class="bubble">
-
-<div id="text"></div>
-
-<div class="buttons" id="buttons">
-<button class="yes" onclick="enter()">Yes I am VIP</button>
-<button class="no" onclick="exitSite()">No I am not VIP</button>
-</div>
-
-</div>
-
-</div>
-
-<script>
-if(localStorage.getItem("seenIntro")){
-    window.location.replace("login.html");
-}
-
-const message =
+</style>  
+</head>  <body>  <div class="container">  <!-- VIP IMAGE -->  <div class="vip">  
+<img src="./vip.png.jpg">  
+</div>  <!-- SPEECH -->  <div class="bubble">  <div id="text"></div>  <div class="buttons" id="buttons">  
+<button class="yes" onclick="enter()">Yes I am VIP</button>  
+<button class="no" onclick="exitSite()">No I am not VIP</button>  
+</div>  </div>  </div>  
+<audio id="typingSound" src="typing.mp3"></audio>  
+<audio id="buttonSound" src="click.mp3"></audio>  
+<script>  
+const typingSound = document.getElementById("typingSound");  
+const buttonSound = document.getElementById("buttonSound");  
+if(localStorage.getItem("seenIntro")){  
+    window.location.replace("login.html");  
+}  const message =
 "Hi Mr/Miss,\n\n"+
 "I am Vip.\n\n"+
 "Welcome to VipsMind.\n\n"+
@@ -151,12 +131,21 @@ const message =
 let i = 0;
 
 function typeText(){
+
+if(i === 0){
+typingSound.loop = true;
+typingSound.play().catch(() => {});
+}
+
 if(i < message.length){
 document.getElementById("text").innerHTML += message.charAt(i);
 i++;
 setTimeout(typeText,28);
 }else{
 document.getElementById("buttons").style.display="block";
+
+typingSound.pause();
+typingSound.currentTime = 0;
 }
 }
 
@@ -164,20 +153,28 @@ typeText();
 
 /* YES  LOGIN */
 function enter(){
+
+buttonSound.currentTime = 0;
+buttonSound.play().catch(() => {});
+
+buttonSound.onended = () => {
 localStorage.setItem("seenIntro","yes");
 window.location.replace("login.html");
+};
+
 }
 /* NO  EXIT */
 function exitSite(){
-    sessionStorage.setItem("exitPressed","yes");
+sessionStorage.setItem("exitPressed","yes");
 
-    if (window.history.length > 1) {
-        history.back();
-    } else {
-        window.location.href = "about:blank";
-    }
+if (window.history.length > 1) {  
+    history.back();  
+} else {  
+    window.location.href = "about:blank";  
+}
+
 }
 </script>
 
-</body>
-</html>
+</body>  
+</html>  
