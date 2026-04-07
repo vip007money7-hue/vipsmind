@@ -20,6 +20,23 @@ button{background:#0047ab;color:#fff;border:0;padding:10px 20px}
 </div>
 
 <script>
+// ✅ ENTRY PROTECTION (only from type page)
+if (!sessionStorage.getItem("allowGroupSetup")) {
+    window.location.replace("index.html");
+}
+
+// one-time use
+setTimeout(() => {
+    sessionStorage.removeItem("allowGroupSetup");
+}, 800);
+
+
+// ✅ FORCE BACK → HOME ONLY
+history.pushState(null, null, location.href);
+
+window.addEventListener("popstate", function () {
+    window.location.href = "index.html";
+});
 function go(){
   const n=gname.value,c=count.value;
   if(!n||c<1){alert("Enter details");return;}
@@ -40,4 +57,4 @@ if (type === "video") {
 }
 </script>
 </body>
-  </html>
+</html>
