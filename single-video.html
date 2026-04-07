@@ -119,7 +119,7 @@ z-index:9999;
     font-size:18px;
     cursor:pointer;
     color:#aaa;
-    ">✕</div>
+    "></div>
 
     <h3>Exit Confirmation</h3>
 
@@ -151,13 +151,16 @@ z-index:9999;
 // FIXED BACK CONTROL
 
 //  ADD THIS LINE (VERY IMPORTANT)
-history.pushState(null, null, location.href);
+if (!sessionStorage.getItem("backInit")) {
+    history.pushState(null, null, location.href);
+    sessionStorage.setItem("backInit", "true");
+}
 let timerBackCount = 0;
 
 window.addEventListener("popstate", function () {
 
     // always block default back
-    history.pushState(null, null, location.href);
+    
 
     const recordBtn = document.getElementById("recordBtn");
     const unlockInput = document.getElementById("unlockInput");
@@ -165,39 +168,42 @@ window.addEventListener("popstate", function () {
 if (popup && popup.style.display === "flex") {
     return; // STOP if popup already open
 }
-    // ✅ TIMER SCREEN
-    if (unlockInput) {
-        timerBackCount++;
+    //  TIMER SCREEN
+if (unlockInput) {
+    timerBackCount++;
 
-        if (timerBackCount === 1) return;
-
-        popup.style.display = "flex";
+    if (timerBackCount === 1) {
+        history.pushState(null, null, location.href);
         return;
     }
 
-    // ✅ RECORDING SCREEN
-    if (recordBtn && recordBtn.innerText === "Stop Recording") {
+    if (popup) {
         popup.style.display = "flex";
-        return;
+    } else {
+        window.location.replace("index.html");
     }
+    return;
+} //  THIS WAS MISSING
 
-    // ✅ START SCREEN
+// RECORDING SCREEN
+if (recordBtn && recordBtn.innerText === "Stop Recording") {
+    if (popup) popup.style.display = "flex";
+    return;
+}
+
+    //  START SCREEN
     window.location.replace("index.html");
 
 });
-
-
-
 function confirmExit() {
-    sessionStorage.setItem("exitPressed", "true");
-   window.location.replace("index.html");
+    sessionStorage.removeItem("backInit");
+    window.location.replace("index.html");
 }
-
 function closeExit() {
     const popup = document.getElementById("exitPopup");
     if (popup) popup.style.display = "none";
 
-    timerBackCount = 0; // VERY IMPORTANT RESET
+    timerBackCount = 1; // VERY IMPORTANT RESET
 }
 // ðŸ”¥ YOUR ORIGINAL CODE (UNCHANGED BELOW)
 
@@ -313,6 +319,8 @@ function showTimerScreen() {
         <input type="datetime-local" id="unlockInput">
         <button class="red" onclick="lockChallenge()">Set Unlock Timer</button>
     `;
+    history.pushState(null, null, location.href);
+    timerBackCount = 0;
 }
 
 
