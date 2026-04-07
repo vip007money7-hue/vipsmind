@@ -159,41 +159,41 @@ let timerBackCount = 0;
 
 window.addEventListener("popstate", function () {
 
-    // always block default back
-    
-
     const recordBtn = document.getElementById("recordBtn");
     const unlockInput = document.getElementById("unlockInput");
     const popup = document.getElementById("exitPopup");
-if (popup && popup.style.display === "flex") {
-    return; // STOP if popup already open
-}
-    //  TIMER SCREEN
-if (unlockInput) {
 
-    if (popup) {
-        popup.style.display = "flex";
-    } else {
-        window.location.replace("index.html");
+    // STOP if popup already open
+    if (popup && popup.style.display === "flex") {
+        return;
     }
 
-    return;
-}
-    if (popup) {
-        popup.style.display = "flex";
-    } else {
-        window.location.replace("index.html");
+    // ================= TIMER SCREEN =================
+    if (unlockInput) {
+        timerBackCount++;
+
+        // 1st click  do nothing
+        if (timerBackCount === 1) {
+            history.pushState(null, null, location.href);
+            return;
+        }
+
+        // 2nd click  show popup
+        if (popup) {
+            popup.style.display = "flex";
+        } else {
+            window.location.replace("index.html");
+        }
+        return;
     }
-    return;
-} //  THIS WAS MISSING
 
-// RECORDING SCREEN
-if (recordBtn && recordBtn.innerText === "Stop Recording") {
-    if (popup) popup.style.display = "flex";
-    return;
-}
+    // ================= RECORDING SCREEN =================
+    if (recordBtn && recordBtn.innerText === "Stop Recording") {
+        if (popup) popup.style.display = "flex";
+        return;
+    }
 
-    //  START SCREEN
+    // ================= START SCREEN =================
     window.location.replace("index.html");
 
 });
@@ -205,7 +205,7 @@ function closeExit() {
     const popup = document.getElementById("exitPopup");
     if (popup) popup.style.display = "none";
 
-    timerBackCount = 1; // VERY IMPORTANT RESET
+    timerBackCount = 0; // VERY IMPORTANT RESET
 }
 // ðŸ”¥ YOUR ORIGINAL CODE (UNCHANGED BELOW)
 
@@ -350,4 +350,4 @@ window.location.replace("goals.html");
 
 </script>
 </body>
-</html>
+        </html>
