@@ -170,13 +170,15 @@ if (popup && popup.style.display === "flex") {
 }
     //  TIMER SCREEN
 if (unlockInput) {
-    timerBackCount++;
 
-    if (timerBackCount === 1) {
-        history.pushState(null, null, location.href);
-        return;
+    if (popup) {
+        popup.style.display = "flex";
+    } else {
+        window.location.replace("index.html");
     }
 
+    return;
+}
     if (popup) {
         popup.style.display = "flex";
     } else {
