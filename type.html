@@ -65,6 +65,11 @@ button {
     </div>
 </div>
 <script>
+// ✅ ENTRY PROTECTION (ADD THIS)
+if (!sessionStorage.getItem("allowTypePage")) {
+    window.location.replace("index.html");
+}
+sessionStorage.removeItem("allowTypePage");
 history.pushState(null, null, location.href);
 
 window.addEventListener("popstate", function () {
