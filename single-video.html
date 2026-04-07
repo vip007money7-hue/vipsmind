@@ -178,14 +178,14 @@ if (document.getElementById("unlockInput") !== null) {
     }
 
     popup.style.display = "flex";
-    history.pushState(null, null, location.href); // ✅ FIX
+    history.pushState(null, null, location.href); //  FIX
     return;
 }
 
     // ================= RECORDING SCREEN =================
 if (recordBtn && recordBtn.innerText === "Stop Recording") {
     if (popup) popup.style.display = "flex";
-    history.pushState(null, null, location.href); // ✅ VERY IMPORTANT
+    history.pushState(null, null, location.href); //  VERY IMPORTANT
     return;
 }
 
