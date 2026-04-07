@@ -23,23 +23,21 @@ button{background:#0047ab;color:#fff;border:0;padding:10px 20px}
 function go(){
   const n=gname.value,c=count.value;
   if(!n||c<1){alert("Enter details");return;}
-  
   localStorage.setItem("groupName",n);
   localStorage.setItem("memberCount",c);
-  localStorage.setItem("currentIndex", 0);
-  localStorage.removeItem("groupLetters");
-  localStorage.removeItem("groupVideos");
-  localStorage.removeItem("letter");
+ localStorage.setItem("currentIndex", 0);
+localStorage.removeItem("groupLetters");
+localStorage.removeItem("groupVideos");
+localStorage.removeItem("letter");
+const type = localStorage.getItem("groupType");
 
-  const type = localStorage.getItem("groupType");
+if (type === "video") {
+    location.href = "group-video.html";
+} else {
+    location.href = "group-write.html";
+}
 
-  if (type === "video") {
-      location.href = "group-video.html";
-  } else {
-      location.href = "group-write.html";
-  }
 }
 </script>
-
 </body>
 </html>
