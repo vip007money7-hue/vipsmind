@@ -168,30 +168,26 @@ window.addEventListener("popstate", function () {
         return;
     }
 
-    // ================= TIMER SCREEN =================
-    if (unlockInput) {
-        timerBackCount++;
+  // ================= TIMER SCREEN =================
+if (document.getElementById("unlockInput") !== null) {
+    timerBackCount++;
 
-        // 1st click  do nothing
-        if (timerBackCount === 1) {
-            history.pushState(null, null, location.href);
-            return;
-        }
-
-        // 2nd click  show popup
-        if (popup) {
-            popup.style.display = "flex";
-        } else {
-            window.location.replace("index.html");
-        }
+    if (timerBackCount === 1) {
+        history.pushState(null, null, location.href);
         return;
     }
+
+    popup.style.display = "flex";
+    history.pushState(null, null, location.href); // ✅ FIX
+    return;
+}
 
     // ================= RECORDING SCREEN =================
-    if (recordBtn && recordBtn.innerText === "Stop Recording") {
-        if (popup) popup.style.display = "flex";
-        return;
-    }
+if (recordBtn && recordBtn.innerText === "Stop Recording") {
+    if (popup) popup.style.display = "flex";
+    history.pushState(null, null, location.href); // ✅ VERY IMPORTANT
+    return;
+}
 
     // ================= START SCREEN =================
     window.location.replace("index.html");
@@ -321,7 +317,7 @@ function showTimerScreen() {
         <input type="datetime-local" id="unlockInput">
         <button class="red" onclick="lockChallenge()">Set Unlock Timer</button>
     `;
-    history.pushState(null, null, location.href);
+   
     timerBackCount = 0;
 }
 
@@ -350,4 +346,4 @@ window.location.replace("goals.html");
 
 </script>
 </body>
-        </html>
+</html>
