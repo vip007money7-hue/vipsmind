@@ -225,12 +225,14 @@ playClick();
 singleBtn.onclick = function () {
 playClick();
     document.getElementById("loader").style.display="flex";
+    
+localStorage.setItem("challengeMode", "single");
+// ✅ ADD THIS LINE
+sessionStorage.setItem("allowTypePage", "true");
 
-    localStorage.setItem("challengeMode", "single");
-
-    setTimeout(()=>{
-        window.location.replace("type.html");
-    },600);
+setTimeout(()=>{
+    window.location.replace("type.html");
+},600);
 
 };
 
@@ -242,9 +244,12 @@ playClick();
 
     localStorage.setItem("challengeMode", "group");
 
-    setTimeout(()=>{
-       window.location.replace("type.html");
-    },600);
+// ✅ ADD THIS LINE
+sessionStorage.setItem("allowTypePage", "true");
+
+setTimeout(()=>{
+   window.location.replace("type.html");
+},600);
 
 };
 
