@@ -128,27 +128,31 @@ const userName = document.getElementById("userName");
 let mediaRecorder;
 let recordedChunks = [];
 let stream;
-// ===== BACK BUTTON DOUBLE PRESS POP =====
+// ===== BACK BUTTON DOUBLE PRESS POP - FIXED =====
 let backPressCount = 0;
 
-history.pushState(null, null, location.href);
+history.replaceState(null, null, location.href);   // Better initial seal
 
 window.addEventListener("popstate", function () {
 
     backPressCount++;
 
     if (backPressCount === 1) {
-        // First back → do nothing, restore state
-        history.pushState(null, null, location.href);
+        history.pushState(null, null, location.href);   // First press: block navigation
         return;
     }
-if (backPressCount === 2) {
-    document.getElementById("exitPopup").style.display = "flex";
-    history.pushState(null, null, location.href);
+
+    if (backPressCount === 2) {
+        const popup = document.getElementById("exitPopup");
+        if (popup) popup.style.display = "flex";
+        history.pushState(null, null, location.href);   // Prevent actual back
+        backPressCount = 0;
+        return;
+    }
+});
+function resetBackCount() {
     backPressCount = 0;
 }
-    
-});
 /* ================= INDEXED DB SETUP ================= */
 
 let db;
@@ -279,6 +283,7 @@ function showSavedScreen() {
             window.location.reload();
         }
     };
+    resetBackCount();
 }
 
 /* ================= TIMER SCREEN ================= */
@@ -295,6 +300,7 @@ function showTimer() {
             Set Unlock Timer
         </button>
     `;
+    resetBackCount();
 }
 
 /* ================= LOCK CHALLENGE ================= */
@@ -324,6 +330,8 @@ function closeExit() {
 }
 
 function confirmExit() {
+    const popup = document.getElementById("exitPopup");
+    if (popup) popup.style.display = "none";
     window.location.replace("index.html");
 }
 </script>
