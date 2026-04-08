@@ -128,7 +128,7 @@ const userName = document.getElementById("userName");
 let mediaRecorder;
 let recordedChunks = [];
 let stream;
-// ===== BACK BUTTON DOUBLE PRESS POP - FINAL SIMPLE VERSION =====
+// ===== GROUP VIDEO - SIMPLE DOUBLE PRESS POP (FINAL) =====
 let backPressCount = 0;
 
 history.replaceState(null, null, location.href);
@@ -138,17 +138,15 @@ window.addEventListener("popstate", function () {
     backPressCount++;
 
     if (backPressCount === 1) {
-        history.pushState(null, null, location.href);   // First back - do nothing
+        history.pushState(null, null, location.href);   // First back - no response
         return;
     }
 
-    if (backPressCount >= 2) {
-        const popup = document.getElementById("exitPopup");
-        if (popup) popup.style.display = "flex";
-        history.pushState(null, null, location.href);   // Stay on current page
-        backPressCount = 0;
-        return;
-    }
+    // Second back - show popup
+    const popup = document.getElementById("exitPopup");
+    if (popup) popup.style.display = "flex";
+    history.pushState(null, null, location.href);
+    backPressCount = 0;
 });
 
 function resetBackCount() {
@@ -373,4 +371,4 @@ z-index:9999;
   </div>
 </div>
 </body>
-    </html>
+</html>
