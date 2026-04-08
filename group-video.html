@@ -128,34 +128,35 @@ const userName = document.getElementById("userName");
 let mediaRecorder;
 let recordedChunks = [];
 let stream;
-// ===== BACK BUTTON DOUBLE PRESS POP =====
+
+// ===== BACK BUTTON DOUBLE PRESS POP (FIXED) =====
 let backPressCount = 0;
 
-history.pushState(null, null, location.href);
+// Push 2 states (important trick)
+history.pushState({}, "");
+history.pushState({}, "");
 
-window.addEventListener("popstate", function () {
+window.onpopstate = function () {
 
     backPressCount++;
 
     if (backPressCount === 1) {
-        // First back → do nothing, restore state
-        history.pushState(null, null, location.href);
+        // First back → block
+        history.pushState({}, "");
         return;
     }
 
     if (backPressCount === 2) {
-        // Second back → show popup
         const confirmExit = confirm("Are you sure you want to exit?");
 
         if (confirmExit) {
-            window.location.href = "index.html";// allow exit
+            window.location.href = "index.html";
         } else {
-            // stay on same page
             backPressCount = 0;
-            history.pushState(null, null, location.href);
+            history.pushState({}, "");
         }
     }
-});
+};
 /* ================= INDEXED DB SETUP ================= */
 
 let db;
