@@ -128,28 +128,28 @@ const userName = document.getElementById("userName");
 let mediaRecorder;
 let recordedChunks = [];
 let stream;
-// ===== BACK BUTTON DOUBLE PRESS POP - FIXED =====
+// ===== BACK BUTTON DOUBLE PRESS POP - CLEAN =====
 let backPressCount = 0;
 
-history.replaceState(null, null, location.href);   // Better initial seal
+history.replaceState(null, null, location.href);
 
 window.addEventListener("popstate", function () {
 
     backPressCount++;
 
     if (backPressCount === 1) {
-        history.pushState(null, null, location.href);   // First press: block navigation
+        history.pushState(null, null, location.href);   // First press: do nothing
         return;
     }
 
-    if (backPressCount === 2) {
+    if (backPressCount >= 2) {
         const popup = document.getElementById("exitPopup");
         if (popup) popup.style.display = "flex";
-        history.pushState(null, null, location.href);   // Prevent actual back
-        backPressCount = 0;
+        history.pushState(null, null, location.href);   // Prevent going back
         return;
     }
 });
+
 function resetBackCount() {
     backPressCount = 0;
 }
