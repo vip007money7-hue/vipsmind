@@ -169,26 +169,30 @@ z-index:9999;
 
 let backPressedOnce = false;
 
+history.replaceState(null, null, location.href);
 history.pushState(null, null, location.href);
-
 window.onpopstate = function () {
 
     if (!backPressedOnce) {
         backPressedOnce = true;
-setTimeout(() => {
-    backPressedOnce = false;
-}, 2000);
-        // push again so user stays
+
+        setTimeout(() => {
+            backPressedOnce = false;
+        }, 2000);
+
         history.pushState(null, null, location.href);
 
     } else {
         document.getElementById("exitPopup").style.display = "flex";
+        history.pushState(null, null, location.href);
     }
 };
+
 
 function closeExit() {
     document.getElementById("exitPopup").style.display = "none";
     backPressedOnce = false;
+    history.pushState(null, null, location.href);
 }
 
  function confirmExit() {
@@ -390,4 +394,4 @@ window.location.replace("goals.html");
 
 </script>
 </body>
-</html>
+    </html>
