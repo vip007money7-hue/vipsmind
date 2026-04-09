@@ -93,7 +93,65 @@ animation:spin 1s linear infinite;
 <div class="spinner"></div>
 </div>
 
+<!-- EXIT POPUP -->
+<div id="exitPopup" style="
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(6px);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:9999;
+">
 
+  <div style="
+  width:85%;
+  max-width:320px;
+  background:#111;
+  border:1px solid #444;
+  padding:20px;
+  border-radius:12px;
+  position:relative;
+  text-align:center;
+  ">
+
+    <div onclick="closeExit()" style="
+    position:absolute;
+    top:10px;
+    right:12px;
+    font-size:18px;
+    cursor:pointer;
+    color:#aaa;
+    ">✕</div>
+
+    <h3>Exit Confirmation</h3>
+
+    <p>
+    Are you sure you want to exit?<br>
+    Your progress will be lost.
+    </p>
+
+    <button onclick="confirmExit()" style="
+    margin-top:18px;
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#facc15;
+    color:black;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    ">
+    Back
+    </button>
+
+  </div>
+</div>
 <div class="box" id="mainBox">
 
 <h2 id="stepText"></h2>
@@ -107,6 +165,36 @@ animation:spin 1s linear infinite;
 </div>
 
 <script>
+/* ================= EXIT POPUP ================= */
+
+let backPressedOnce = false;
+
+history.pushState(null, null, location.href);
+
+window.onpopstate = function () {
+
+    if (!backPressedOnce) {
+        backPressedOnce = true;
+setTimeout(() => {
+    backPressedOnce = false;
+}, 2000);
+        // push again so user stays
+        history.pushState(null, null, location.href);
+
+    } else {
+        document.getElementById("exitPopup").style.display = "flex";
+    }
+};
+
+function closeExit() {
+    document.getElementById("exitPopup").style.display = "none";
+    backPressedOnce = false;
+}
+
+ function confirmExit() {
+    window.onpopstate = null;
+ history.back();
+}
 
 const total = Number(localStorage.getItem("memberCount")) || 0;
 if (!total || total <= 0) {
@@ -128,31 +216,6 @@ const userName = document.getElementById("userName");
 let mediaRecorder;
 let recordedChunks = [];
 let stream;
-// ===== GROUP VIDEO - SIMPLE DOUBLE PRESS POP (FINAL) =====
-let backPressCount = 0;
-
-history.replaceState(null, null, location.href);
-
-window.addEventListener("popstate", function () {
-
-    backPressCount++;
-
-    if (backPressCount === 1) {
-        history.pushState(null, null, location.href);   // First back - no response
-        return;
-    }
-
-    // Second back - show popup
-    const popup = document.getElementById("exitPopup");
-    if (popup) popup.style.display = "flex";
-    history.pushState(null, null, location.href);
-    backPressCount = 0;
-});
-
-function resetBackCount() {
-    backPressCount = 0;
-}
-
 
 /* ================= INDEXED DB SETUP ================= */
 
@@ -284,7 +347,6 @@ function showSavedScreen() {
             window.location.reload();
         }
     };
-    resetBackCount();
 }
 
 /* ================= TIMER SCREEN ================= */
@@ -301,7 +363,6 @@ function showTimer() {
             Set Unlock Timer
         </button>
     `;
-    resetBackCount();
 }
 
 /* ================= LOCK CHALLENGE ================= */
@@ -326,49 +387,7 @@ setTimeout(()=>{
 window.location.replace("goals.html");
 },600);
 }
-function closeExit() {
-    document.getElementById("exitPopup").style.display = "none";
-}
 
-function confirmExit() {
-    const popup = document.getElementById("exitPopup");
-    if (popup) popup.style.display = "none";
-    window.location.replace("index.html");
-}
 </script>
-<div id="exitPopup" style="
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.7);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:9999;
-">
-
-  <div style="
-  width:85%;
-  max-width:300px;
-  background:#111;
-  padding:20px;
-  border-radius:12px;
-  text-align:center;
-  ">
-
-    <h3>Exit?</h3>
-
-    <button onclick="confirmExit()" style="width:100%;padding:10px;margin-top:10px;background:#dc3545;color:#fff;border:none;border-radius:6px;">
-    Yes Exit
-    </button>
-
-    <button onclick="closeExit()" style="width:100%;padding:10px;margin-top:10px;background:#444;color:#fff;border:none;border-radius:6px;">
-    Cancel
-    </button>
-
-  </div>
-</div>
 </body>
 </html>
