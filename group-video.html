@@ -93,6 +93,18 @@ animation:spin 1s linear infinite;
 <div class="spinner"></div>
 </div>
 
+
+<div class="box" id="mainBox">
+
+<h2 id="stepText"></h2>
+
+<input id="userName" placeholder="Enter your name">
+
+<video id="preview" autoplay muted style="display:none;"></video>
+
+<button id="recordBtn">Start Recording</button>
+
+</div>
 <!-- EXIT POPUP -->
 <div id="exitPopup" style="
 position:fixed;
@@ -126,7 +138,7 @@ z-index:9999;
     font-size:18px;
     cursor:pointer;
     color:#aaa;
-    ">✕</div>
+    ">✖</div>
 
     <h3>Exit Confirmation</h3>
 
@@ -152,53 +164,51 @@ z-index:9999;
 
   </div>
 </div>
-<div class="box" id="mainBox">
-
-<h2 id="stepText"></h2>
-
-<input id="userName" placeholder="Enter your name">
-
-<video id="preview" autoplay muted style="display:none;"></video>
-
-<button id="recordBtn">Start Recording</button>
-
-</div>
 
 <script>
-/* ================= EXIT POPUP ================= */
+// BACK BUTTON CONTROL (GROUP FLOW)
 
-let backPressedOnce = false;
-
-history.replaceState(null, null, location.href);
-history.pushState(null, null, location.href);
-window.onpopstate = function () {
-
-    if (!backPressedOnce) {
-        backPressedOnce = true;
-
-        setTimeout(() => {
-            backPressedOnce = false;
-        }, 2000);
-
-        history.pushState(null, null, location.href);
-
-    } else {
-        document.getElementById("exitPopup").style.display = "flex";
-        history.pushState(null, null, location.href);
-    }
-};
-
-
-function closeExit() {
-    document.getElementById("exitPopup").style.display = "none";
-    backPressedOnce = false;
+if (!sessionStorage.getItem("backInit")) {
     history.pushState(null, null, location.href);
+    sessionStorage.setItem("backInit", "true");
 }
 
- function confirmExit() {
-    window.onpopstate = null;
- history.back();
-}
+let timerBackCount = 0;
+
+window.addEventListener("popstate", function () {
+
+    const popup = document.getElementById("exitPopup");
+    const recordBtn = document.getElementById("recordBtn");
+
+    // If popup already open → do nothing
+    if (popup && popup.style.display === "flex") {
+        return;
+    }
+
+    // TIMER SCREEN
+    if (document.getElementById("unlockInput") !== null) {
+        timerBackCount++;
+
+        if (timerBackCount === 1) {
+            history.pushState(null, null, location.href);
+            return;
+        }
+
+        popup.style.display = "flex";
+        history.pushState(null, null, location.href);
+        return;
+    }
+
+    // RECORDING SCREEN
+    if (recordBtn && recordBtn.innerText === "Stop Recording") {
+        popup.style.display = "flex";
+        history.pushState(null, null, location.href);
+        return;
+    }
+
+    // NORMAL SCREEN → GO HOME
+    window.location.replace("index.html");
+});
 
 const total = Number(localStorage.getItem("memberCount")) || 0;
 if (!total || total <= 0) {
@@ -391,7 +401,17 @@ setTimeout(()=>{
 window.location.replace("goals.html");
 },600);
 }
+function confirmExit() {
+    sessionStorage.removeItem("backInit");
+    window.location.replace("index.html");
+}
 
+function closeExit() {
+    const popup = document.getElementById("exitPopup");
+    if (popup) popup.style.display = "none";
+
+    timerBackCount = 0;
+}
 </script>
 </body>
-    </html>
+</html>
