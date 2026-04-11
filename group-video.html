@@ -186,20 +186,18 @@ window.addEventListener("popstate", function () {
     }
 
     // TIMER SCREEN
- if (document.querySelector("#unlockInput")) {
-    timerBackCount++;
+    if (document.getElementById("unlockInput") !== null) {
+        timerBackCount++;
 
-    if (timerBackCount === 1) {
-        if (!window.backLocked) {
+        if (timerBackCount === 1) {
             history.pushState(null, null, location.href);
-            window.backLocked = true;
+            return;
         }
 
         popup.style.display = "flex";
         history.pushState(null, null, location.href);
         return;
     }
-}
 
     // RECORDING SCREEN
     if (recordBtn && recordBtn.innerText === "Stop Recording") {
@@ -212,7 +210,7 @@ window.addEventListener("popstate", function () {
     window.location.replace("index.html");
 });
 
-const total = Number(localStorage.getItem("memberCount"));
+const total = Number(localStorage.getItem("memberCount")) || 0;
 if (!total || total <= 0) {
     alert("Invalid group setup");
     window.location.href = "group-setup.html";
@@ -262,84 +260,79 @@ updateStep();
 /* ================= RECORD BUTTON ================= */
 
 recordBtn.onclick = async function () {
-const savedName = userName.value.trim();
+
     if (!userName.value) {
         alert("Enter your name");
         return;
     }
 
     // START RECORDING
-    if (recordBtn.innerText === "Start Recording") {
+    if (recordBtn.innerText.includes("Start")) {
 
-    stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-        audio: true
-    });
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" },
+            audio: true
+        });
 
-    preview.style.display = "block";
-    preview.srcObject = stream;
+        preview.style.display = "block";
+        preview.srcObject = stream;
 
-    recordedChunks = [];
+        recordedChunks = [];
 
-    if (MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) {
-        mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm;codecs=vp9" });
-    } else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp8")) {
-        mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm;codecs=vp8" });
-    } else {
-        mediaRecorder = new MediaRecorder(stream);
-    }
-
-    mediaRecorder.ondataavailable = e => {
-        if (e.data && e.data.size > 0) {
-            recordedChunks.push(e.data);
-        }
-    };
-
-    mediaRecorder.start();
-    recordBtn.innerText = "Stop Recording";
-
+       if (MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) {
+    mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm;codecs=vp9" });
+} else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp8")) {
+    mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm;codecs=vp8" });
 } else {
+    mediaRecorder = new MediaRecorder(stream);
+}
+
+        mediaRecorder.ondataavailable = e => {
+            if (e.data && e.data.size > 0) {
+                recordedChunks.push(e.data);
+            }
+        };
+
+        mediaRecorder.start();
+        recordBtn.innerText = "Stop Recording";
+
+    } else {
 
         // STOP RECORDING
-mediaRecorder.onstop = function () {
+        mediaRecorder.stop();
 
-    stream.getTracks().forEach(track => track.stop());
+        mediaRecorder.onstop = function () {
 
-    const blob = new Blob(recordedChunks, { type: "video/webm" });
+            stream.getTracks().forEach(track => track.stop());
 
-    if (!db) {
-        alert("Database not ready");
-        return;
-    }
+         const blob = new Blob(recordedChunks, { type: "video/webm" });
 
-    const transaction = db.transaction(["videos"], "readwrite");
-    const store = transaction.objectStore("videos");
-
-    store.put({
-        id: "groupVideo_" + index,
-        blob: blob
-    });
-
-    let videos = JSON.parse(localStorage.getItem("groupVideos") || "[]");
-
-    videos.push({
-        name: userName.value.trim(),
-        id: "groupVideo_" + index
-    });
-
-    localStorage.setItem("groupVideos", JSON.stringify(videos));
-
-    recordedChunks = [];
-    showSavedScreen();
-    recordBtn.innerText = "Start Recording";
-};
-
-if (mediaRecorder && mediaRecorder.state !== "inactive") {
-    mediaRecorder.stop();
-}
-}
             // SAVE VIDEO TO INDEXED DB
+            const transaction = db.transaction(["videos"], "readwrite");
+            const store = transaction.objectStore("videos");
 
+            store.put({
+                id: "groupVideo_" + index,
+                blob: blob
+            });
+
+            // Save name only in localStorage
+            let videos = JSON.parse(localStorage.getItem("groupVideos") || "[]");
+
+            videos.push({
+              name: userName.value.trim(),
+                id: "groupVideo_" + index
+            });
+
+            localStorage.setItem("groupVideos", JSON.stringify(videos));
+
+            recordedChunks = [];
+            showSavedScreen();
+        };
+
+        recordBtn.innerText = "Start Recording";
+    }
+};
 
 /* ================= AFTER SAVE SCREEN ================= */
 
@@ -421,4 +414,4 @@ function closeExit() {
 }
 </script>
 </body>
-</html>
+    </html>
