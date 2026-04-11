@@ -178,7 +178,7 @@ let timerBackCount = 0;
 window.addEventListener("popstate", function () {
 
     const popup = document.getElementById("exitPopup");
-    
+    const recordBtn = document.getElementById("recordBtn");
 
     // If popup already open → do nothing
     if (popup && popup.style.display === "flex") {
@@ -186,15 +186,28 @@ window.addEventListener("popstate", function () {
     }
 
     // TIMER SCREEN
-timerBackCount++;
+    if (document.getElementById("unlockInput") !== null) {
+        timerBackCount++;
 
-if (timerBackCount === 1) {
-  history.pushState(null, null, location.href);
-  return;
-}
+        if (timerBackCount === 1) {
+            history.pushState(null, null, location.href);
+            return;
+        }
 
-popup.style.display = "flex";
-history.pushState(null, null, location.href);
+        popup.style.display = "flex";
+        history.pushState(null, null, location.href);
+        return;
+    }
+
+    // RECORDING SCREEN
+    if (recordBtn && recordBtn.innerText === "Stop Recording") {
+        popup.style.display = "flex";
+        history.pushState(null, null, location.href);
+        return;
+    }
+
+    // NORMAL SCREEN → GO HOME
+    window.location.replace("index.html");
 });
 
 const total = Number(localStorage.getItem("memberCount")) || 0;
@@ -246,7 +259,6 @@ updateStep();
 
 /* ================= RECORD BUTTON ================= */
 
-if (recordBtn) {
 recordBtn.onclick = async function () {
 
     if (!userName.value) {
@@ -321,7 +333,6 @@ recordBtn.onclick = async function () {
         recordBtn.innerText = "Start Recording";
     }
 };
-}
 
 /* ================= AFTER SAVE SCREEN ================= */
 
@@ -369,6 +380,7 @@ function showTimer() {
 }
 
 /* ================= LOCK CHALLENGE ================= */
+
 function lockChallenge() {
 
     const unlock = document.getElementById("unlockInput").value;
@@ -383,11 +395,11 @@ function lockChallenge() {
     localStorage.setItem("challengeMode", "group-video");
     localStorage.setItem("challengeStatus", "locked");
 
-    document.getElementById("loader").style.display = "flex";
+ document.getElementById("loader").style.display="flex";
 
-    setTimeout(() => {
-        window.location.replace("goals.html");
-    }, 600);
+setTimeout(()=>{
+window.location.replace("goals.html");
+},600);
 }
 function confirmExit() {
     sessionStorage.removeItem("backInit");
@@ -402,4 +414,4 @@ function closeExit() {
 }
 </script>
 </body>
-        </html>
+    </html>
