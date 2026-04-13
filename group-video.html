@@ -166,10 +166,8 @@ z-index:9999;
 </div>
 
 <script>
-// ===== ONE SIMPLE RULE FOR ALL SCREENS IN GROUP VIDEO =====
-// ===== ONE SIMPLE RULE FOR ALL SCREENS IN GROUP VIDEO =====
+// ===== SIMPLE BACK BUTTON RULE - ONE RULE FOR ALL SCREENS =====
 history.replaceState(null, null, location.href);
-history.pushState(null, null, location.href);   // extra seal
 
 let backPressCount = 0;
 
@@ -182,17 +180,13 @@ window.addEventListener("popstate", function () {
         return;
     }
 
-    // Second press = show popup (same for every screen)
+    // Second press = show popup
     const popup = document.getElementById("exitPopup");
     if (popup) popup.style.display = "flex";
 
-    // Strong stay on current page
-    history.pushState(null, null, location.href);
-    history.pushState(null, null, location.href);
     history.pushState(null, null, location.href);
     backPressCount = 0;
 });
-
 const total = Number(localStorage.getItem("memberCount")) || 0;
 if (!total || total <= 0) {
     alert("Invalid group setup");
@@ -397,4 +391,4 @@ function closeExit() {
 }
 </script>
 </body>
-</html>
+    </html>
