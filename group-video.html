@@ -168,6 +168,7 @@ z-index:9999;
 <script>
 // ===== ONE SIMPLE RULE FOR ALL SCREENS IN GROUP VIDEO =====
 history.replaceState(null, null, location.href);
+history.pushState(null, null, location.href);   // extra seal
 
 let backPressCount = 0;
 
@@ -180,11 +181,12 @@ window.addEventListener("popstate", function () {
         return;
     }
 
-    // Second press = show popup (same for every screen)
+        // Second press = show popup (same for every screen)
     const popup = document.getElementById("exitPopup");
     if (popup) popup.style.display = "flex";
 
     history.pushState(null, null, location.href);
+    history.pushState(null, null, location.href);   // extra push to stay
     backPressCount = 0;
 });
 
@@ -392,4 +394,4 @@ function closeExit() {
 }
 </script>
 </body>
-    </html>
+      </html>
