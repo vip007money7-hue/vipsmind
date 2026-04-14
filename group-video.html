@@ -166,27 +166,50 @@ z-index:9999;
 </div>
 
 <script>
-// ===== SIMPLE BACK BUTTON RULE - ONE RULE FOR ALL SCREENS =====
-history.replaceState(null, null, location.href);
+// BACK BUTTON CONTROL (GROUP FLOW)
 
-let backPressCount = 0;
+if (!sessionStorage.getItem("backInit")) {
+    history.pushState(null, null, location.href);
+    sessionStorage.setItem("backInit", "true");
+}
+
+let timerBackCount = 0;
 
 window.addEventListener("popstate", function () {
 
-    backPressCount++;
+    const popup = document.getElementById("exitPopup");
+    const recordBtn = document.getElementById("recordBtn");
 
-    if (backPressCount === 1) {
-        history.pushState(null, null, location.href);   // First press = nothing
+    // If popup already open → do nothing
+    if (popup && popup.style.display === "flex") {
         return;
     }
 
-    // Second press = show popup
-    const popup = document.getElementById("exitPopup");
-    if (popup) popup.style.display = "flex";
+    // TIMER SCREEN
+    if (document.getElementById("unlockInput") !== null) {
+        timerBackCount++;
 
-    history.pushState(null, null, location.href);
-    backPressCount = 0;
+        if (timerBackCount === 1) {
+            history.pushState(null, null, location.href);
+            return;
+        }
+
+        popup.style.display = "flex";
+        history.pushState(null, null, location.href);
+        return;
+    }
+
+    // RECORDING SCREEN
+    if (recordBtn && recordBtn.innerText === "Stop Recording") {
+        popup.style.display = "flex";
+        history.pushState(null, null, location.href);
+        return;
+    }
+
+    // NORMAL SCREEN → GO HOME
+    window.location.replace("index.html");
 });
+
 const total = Number(localStorage.getItem("memberCount")) || 0;
 if (!total || total <= 0) {
     alert("Invalid group setup");
