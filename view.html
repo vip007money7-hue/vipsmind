@@ -67,7 +67,7 @@ if (mode === "single") {
 
             container.innerHTML =
                 "<div class='card'>" +
-                "<p>" + letter + "</p>" +
+               "<div style='white-space:pre-wrap; text-align:left;'>" + letter + "</div>" +
              "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
                 "</div>";
         });
@@ -149,7 +149,7 @@ else if (mode === "group-write") {
         "<h3>" + (index + 1) + " of " + letters.length + "</h3>" +
         "<div class='card'>" +
         "<h3>" + person.name + "</h3>" +
-        "<p>" + person.text + "</p>" +
+       "<div style='white-space:pre-wrap; text-align:left;'>" + person.text + "</div>" +
         "<button id='nextBtn'></button>" +
         "</div>";
 
