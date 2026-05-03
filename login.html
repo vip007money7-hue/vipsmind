@@ -110,11 +110,12 @@ animation:spin 1s linear infinite;
 </style>
 
 <script>
-//  INTRO CHECK (ADD THIS)
+// INTRO CHECK
 if(!localStorage.getItem("seenIntro")){
     window.location.replace("intro.html");
 }
-/* ðŸ”¥ AUTO REDIRECT IF ALREADY LOGGED */
+
+/* AUTO REDIRECT IF ALREADY LOGGED */
 if(localStorage.getItem("userEmail")){
 document.addEventListener("DOMContentLoaded",()=>{
 document.getElementById("loader").style.display="flex";
@@ -156,6 +157,7 @@ signInWithPopup,
 signInWithEmailAndPassword,
 createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
@@ -166,16 +168,19 @@ messagingSenderId: "257825847385",
 appId: "1:257825847385:web:ee3592957535a99e915948"
 };
 
+
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 window.login = function(){
 
-const email=document.getElementById("email").value.trim();
+const emailInput = document.getElementById("email");
+const email = emailInput ? emailInput.value.trim() : "";
 
 if(!email){
-alert("Please enter your email");
+alert("Enter a valid email");
 return;
 }
 
@@ -185,6 +190,7 @@ signInWithEmailAndPassword(auth,email,password)
 .then((userCredential)=>{
 
 localStorage.setItem("userEmail",userCredential.user.email);
+localStorage.setItem("uid", userCredential.user.uid);
 document.getElementById("loader").style.display="flex";
 setTimeout(()=>{
 window.location.replace("index.html");
@@ -197,6 +203,7 @@ createUserWithEmailAndPassword(auth,email,password)
 .then((userCredential)=>{
 
 localStorage.setItem("userEmail",userCredential.user.email);
+localStorage.setItem("uid", userCredential.user.uid);
 document.getElementById("loader").style.display="flex";
 setTimeout(()=>{
 window.location.replace("index.html");
@@ -211,23 +218,32 @@ alert(error.message);
 
 };
 
-document.getElementById("googleBtn").addEventListener("click", () => {
+document.addEventListener("DOMContentLoaded", () => {
 
-signInWithPopup(auth, provider)
-.then((result) => {
+    const googleBtn = document.getElementById("googleBtn");
 
-localStorage.setItem("userEmail", result.user.email);
-document.getElementById("loader").style.display="flex";
-setTimeout(()=>{
-window.location.replace("index.html");
-},800);
+    if (googleBtn) {
+        googleBtn.addEventListener("click", () => {
 
-})
-.catch(() => {
+            signInWithPopup(auth, provider)
+            .then((result) => {
 
-alert("Google Sign-in Failed");
+                localStorage.setItem("userEmail", result.user.email);
+                localStorage.setItem("uid", result.user.uid);
 
-});
+                document.getElementById("loader").style.display = "flex";
+
+                setTimeout(() => {
+                    window.location.replace("index.html");
+                }, 800);
+
+            })
+            .catch(() => {
+                alert("Google Sign-in Failed");
+            });
+
+        });
+    }
 
 });
 
