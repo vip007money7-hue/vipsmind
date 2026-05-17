@@ -30,50 +30,17 @@ video {
 
 <div id="content"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-
-import {
-getFirestore,
-doc,
-getDoc
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-const firebaseConfig = {
-apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
-authDomain: "vipsmind-b34fc.firebaseapp.com",
-projectId: "vipsmind-b34fc"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+<script>
 
 const container = document.getElementById("content");
-const params = new URLSearchParams(window.location.search);
+let mode = localStorage.getItem("challengeMode") || "";
 
-const challengeId = params.get("id");
 
-let mode = "";
-let firebaseData = null;
 
-if (!challengeId) {
-    container.innerHTML = "<h3>No Challenge ID Found</h3>";
-    throw new Error("Challenge ID missing");
+if (!mode) {
+    container.innerHTML = "<h3>No challenge found</h3>";
+    throw new Error("Mode missing");
 }
-
-const docRef = doc(db, "challenges", challengeId);
-
-const docSnap = await getDoc(docRef);
-
-if (!docSnap.exists()) {
-    container.innerHTML = "<h3>Challenge Not Found</h3>";
-    throw new Error("Challenge missing");
-}
-
-firebaseData = docSnap.data();
-
-mode = firebaseData.mode;
-
 /* ================= START SCREEN ================= */
 
 function showStartScreen(title, startFunction) {
@@ -89,8 +56,8 @@ function showStartScreen(title, startFunction) {
 
 if (mode === "single") {
 
-const name = firebaseData.name;
-const letter = firebaseData.letter;
+    const name = localStorage.getItem("singleName");
+    const letter = localStorage.getItem("letter");
 
     if (!letter) {
         container.innerHTML = "<h3>No letter found</h3>";
@@ -111,7 +78,7 @@ const letter = firebaseData.letter;
 
 else if (mode === "single-video") {
 
-const name = firebaseData.name;
+    const name = localStorage.getItem("singleName");
 
     if (!name) {
         container.innerHTML = "<h3>No video found</h3>";
@@ -162,8 +129,8 @@ const name = firebaseData.name;
 
 else if (mode === "group-write") {
 
-  const groupName = firebaseData.groupName;
-const letters = firebaseData.letters || [];
+    const groupName = localStorage.getItem("groupName");
+    const letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
 
     if (letters.length === 0) {
         container.innerHTML = "<h3>No letters found</h3>";
@@ -213,7 +180,7 @@ const letters = firebaseData.letters || [];
 
 else if (mode === "group-video") {
 
-const videos = firebaseData.videos || [];
+    const videos = JSON.parse(localStorage.getItem("groupVideos")) || [];
 
     if (videos.length === 0) {
         container.innerHTML = "<h3>No videos found</h3>";
@@ -305,10 +272,10 @@ function showCompletionScreen() {
     let titleName = "";
 
     if (mode === "single" || mode === "single-video") {
-titleName = firebaseData.name || "User"
+        titleName = localStorage.getItem("singleName") || "User";
     } 
     else if (mode === "group-write" || mode === "group-video") {
-  titleName = firebaseData.groupName || "Group"
+        titleName = localStorage.getItem("groupName") || "Group";
     }
 
     container.innerHTML = `
@@ -331,8 +298,8 @@ function downloadContent() {
 
 if (mode === "single") {
 
-const name = firebaseData.name || "User";
-const letter = firebaseData.letter || "";
+const name = localStorage.getItem("singleName") || "User";
+const letter = localStorage.getItem("letter") || "";
 
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
@@ -375,8 +342,8 @@ doc.save("VipsMind_Letter.pdf");
       
 else if (mode === "group-write") {
 
-const groupName = firebaseData.groupName || "Group";
-const letters = firebaseData.letters || [];
+const groupName = localStorage.getItem("groupName") || "Group";
+const letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
 
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
@@ -445,7 +412,7 @@ const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
  a.href = url;
-a.download = "VipsMind_" + (firebaseData.name || "Video") + ".mp4";
+a.download = "VipsMind_" + (localStorage.getItem("singleName") || "Video") + ".mp4";
  document.body.appendChild(a);
  a.click();
 
@@ -460,7 +427,7 @@ URL.revokeObjectURL(url);
 
 else if (mode === "group-video") {
 
-const videos = firebaseData.videos || [];
+const videos = JSON.parse(localStorage.getItem("groupVideos")) || [];
 
 const request = indexedDB.open("VipsMindDB", 1);
 
@@ -526,10 +493,10 @@ function shareContent() {
     let name = "";
 
     if (mode === "single" || mode === "single-video") {
-     name = firebaseData.name || "User";
+        name = localStorage.getItem("singleName") || "User";
     } 
     else {
-name = firebaseData.groupName || "Group";
+        name = localStorage.getItem("groupName") || "Group";
     }
 
    const text =
@@ -555,4 +522,4 @@ name = firebaseData.groupName || "Group";
 }
 </script>
 </body>
-</html>
+    </html>
