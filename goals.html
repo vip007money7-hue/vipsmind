@@ -38,58 +38,32 @@
     <div id="nameBox"></div>
     <div id="dates"></div>
 </div>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
-  authDomain: "vipsmind-b34fc.firebaseapp.com",
-  projectId: "vipsmind-b34fc"
-};
-
-const app = initializeApp(firebaseConfig);
-window.db = getFirestore(app);
-window.doc = doc;
-window.getDoc = getDoc;
-</script>
 <script>
-window.onload = async function() {
+window.onload = function() {
 const nameBox = document.getElementById("nameBox");
 const dates = document.getElementById("dates");
 
-const uid = localStorage.getItem("uid");
+const mode = localStorage.getItem("challengeMode");
 
-if (!uid) {
-    dates.innerText = "Login required";
+if (!mode) {
+    dates.innerText = "No challenge placed";
     return;
 }
 
-try {
-const docRef = window.doc(window.db, "users", uid);
-const snap = await window.getDoc(docRef);
-
-    if (!snap.exists()) {
-        dates.innerText = "No challenge placed";
-        return;
-    }
-
-    const data = snap.data();
-
-    const mode = data.challengeMode;
-    const lock = data.lockTime;
-    const unlock = data.unlockTime;
+    const lock = Number(localStorage.getItem("lockTime"));
+    const unlock = Number(localStorage.getItem("unlockTime"));
     const now = Date.now();
 
     // ===== SHOW NAME =====
     if (mode === "group-write" || mode === "group-video") {
-        nameBox.innerText = data.groupName ? "Dear " + data.groupName : "";
+        const groupName = localStorage.getItem("groupName");
+        nameBox.innerText = groupName ? "Dear " + groupName : "";
     }
     else if (mode === "single" || mode === "single-video") {
-        nameBox.innerText = data.singleName ? "Dear " + data.singleName : "";
+        const singleName = localStorage.getItem("singleName");
+        nameBox.innerText = singleName ? "Dear " + singleName : "";
     }
-
-    // continue SAME logic...
 
     function format(d) {
         const date = new Date(d);
@@ -144,12 +118,8 @@ const snap = await window.getDoc(docRef);
             "<br><br>" +
             "<button onclick='playClick(); startViewing()'>Start Viewing</button>";
     }
-}
-catch (e) {
-    dates.innerText = "Error loading data";
-    console.error(e);
-}
 };
+
 function startViewing() {
     window.location.href = "view.html";
 }
@@ -216,6 +186,7 @@ star.x += star.speed * 0.6;  // move RIGHT (slower than Y for smooth angle)
 }
 
 drawStars();
+</script>
 </script>
 <audio id="clickSound" src="click.mp3"></audio>
 </body>
