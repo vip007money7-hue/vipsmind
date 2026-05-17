@@ -158,27 +158,6 @@ z-index:9999;
 
   </div>
 </div>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-const firebaseConfig = {
-apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
-authDomain: "vipsmind-b34fc.firebaseapp.com",
-projectId: "vipsmind-b34fc",
-storageBucket: "vipsmind-b34fc.firebasestorage.app",
-messagingSenderId: "257825847385",
-appId: "1:257825847385:web:ee3592957535a99e915948"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// 👇 MAKE GLOBAL
-window.db = db;
-window.setDoc = setDoc;
-window.doc = doc;
-</script>
 <script>
 
 const actionBtn = document.getElementById("actionBtn");
@@ -221,7 +200,7 @@ function confirmExit() {
    window.location.replace("index.html");
 }
 
-actionBtn.onclick = async function () {
+actionBtn.onclick = function () {
 
   if (step === 1) {
 if (!username.value.trim()) {
@@ -247,44 +226,13 @@ if (!unlock.value) {
     alert("Select date");
     return;
 }
-const selectedTime = new Date(unlock.value).getTime();
 
-if (selectedTime <= Date.now()) {
-    alert("Select future date");
-    return;
-}
-const uid = localStorage.getItem("uid");
-if (!uid) {
-  alert("Login required");
-  return;
-}
-const now = Date.now();
 localStorage.setItem("singleName", username.value.trim());
 localStorage.setItem("letter", letter.value);
-localStorage.setItem("lockTime", now);
-localStorage.setItem("unlockTime", selectedTime);
+localStorage.setItem("lockTime", Date.now());
+localStorage.setItem("unlockTime", new Date(unlock.value).getTime());
 localStorage.setItem("challengeMode", "single");
 localStorage.setItem("challengeStatus", "locked");
-
-actionBtn.disabled = true;
-try {
-  await window.setDoc(window.doc(window.db, "users", uid), {
-    singleName: username.value.trim(),
-    letter: letter.value,
-    lockTime: now,
-unlockTime: selectedTime,
-    challengeMode: "single",
-    challengeStatus: "locked"
-  }, { merge: true });
-
-} catch (error) {
-  alert("Error saving challenge");
-  console.error(error);
-actionBtn.disabled = false;
-document.getElementById("loader").style.display = "none";
-  return;
-}
-
 localStorage.removeItem("groupLetters");
 localStorage.removeItem("groupVideos");
 alert("Challenge Placed Successfully");
@@ -301,4 +249,4 @@ window.location.replace("goals.html");
 </script>
 
 </body>
-      </html>
+</html>
