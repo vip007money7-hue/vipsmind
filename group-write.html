@@ -109,13 +109,8 @@ animation:spin 1s linear infinite;
 <button id="actionBtn"></button>
 
 </div>
-<script type="module">
-import { db } from "./firebase.js";
-import {
-doc,
-setDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+<script>
 
 const total = Number(localStorage.getItem("memberCount"));
 let index = Number(localStorage.getItem("currentIndex")) || 0;
@@ -181,7 +176,7 @@ function nextPerson(){
     render();
 }
 
-async function lockChallenge(){
+function lockChallenge(){
 
     const value = document.getElementById("unlockInput").value;
 
@@ -196,17 +191,7 @@ async function lockChallenge(){
     localStorage.setItem("lockTime", Date.now());
     localStorage.setItem("challengeMode", "group-write");
     localStorage.setItem("challengeStatus", "locked");
-const email = localStorage.getItem("userEmail");
 
-await setDoc(doc(db, "challenges", email), {
-groupLetters: JSON.parse(localStorage.getItem("groupLetters")) || [],
-groupName: localStorage.getItem("groupName") || "VIPSMIND",
-memberCount: total,
-unlockTime: unlockTime,
-lockTime: Date.now(),
-challengeMode: "group-write",
-challengeStatus: "locked"
-}, { merge:true });
   document.getElementById("loader").style.display="flex";
 
 setTimeout(()=>{
