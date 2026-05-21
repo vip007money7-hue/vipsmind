@@ -181,22 +181,27 @@ return;
 
 const password="vipsmind_user";
 
-signInWithEmailAndPassword(auth,email,password)
+createUserWithEmailAndPassword(auth,email,password)
 .then((userCredential)=>{
 
 localStorage.setItem("userEmail",userCredential.user.email);
+localStorage.setItem("uid", userCredential.user.uid);   // ← Add this line
+
 document.getElementById("loader").style.display="flex";
 setTimeout(()=>{
 window.location.replace("index.html");
 },800);
 
 })
+
 .catch(()=>{
 
 createUserWithEmailAndPassword(auth,email,password)
 .then((userCredential)=>{
 
 localStorage.setItem("userEmail",userCredential.user.email);
+localStorage.setItem("uid", userCredential.user.uid);   // ← Add this line
+
 document.getElementById("loader").style.display="flex";
 setTimeout(()=>{
 window.location.replace("index.html");
@@ -213,21 +218,21 @@ alert(error.message);
 
 document.getElementById("googleBtn").addEventListener("click", () => {
 
-signInWithPopup(auth, provider)
-.then((result) => {
+    signInWithPopup(auth, provider)
+    .then((result) => {
 
-localStorage.setItem("userEmail", result.user.email);
-document.getElementById("loader").style.display="flex";
-setTimeout(()=>{
-window.location.replace("index.html");
-},800);
+        localStorage.setItem("userEmail", result.user.email);
+        localStorage.setItem("uid", result.user.uid);     // ← Very Important for your goal
 
-})
-.catch(() => {
+        document.getElementById("loader").style.display="flex";
+        setTimeout(()=>{
+            window.location.replace("index.html");
+        },800);
 
-alert("Google Sign-in Failed");
-
-});
+    })
+    .catch(() => {
+        alert("Google Sign-in Failed");
+    });
 
 });
 
