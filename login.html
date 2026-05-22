@@ -172,46 +172,39 @@ const provider = new GoogleAuthProvider();
 
 window.login = function(){
 
-const email=document.getElementById("email").value.trim();
+const email = document.getElementById("email").value.trim();
 
 if(!email){
-alert("Please enter your email");
-return;
+    alert("Please enter your email");
+    return;
 }
 
-const password="vipsmind_user";
+const password = "vipsmind_user";
 
-createUserWithEmailAndPassword(auth,email,password)
-.then((userCredential)=>{
-
-localStorage.setItem("userEmail",userCredential.user.email);
-localStorage.setItem("uid", userCredential.user.uid);   // ← Add this line
-
-document.getElementById("loader").style.display="flex";
-setTimeout(()=>{
-window.location.replace("index.html");
-},800);
-
+// Try to sign in first (best for returning users)
+signInWithEmailAndPassword(auth, email, password)
+.then((userCredential) => {
+    localStorage.setItem("userEmail", userCredential.user.email);
+    localStorage.setItem("uid", userCredential.user.uid);
+    document.getElementById("loader").style.display="flex";
+    setTimeout(() => {
+        window.location.replace("index.html");
+    }, 800);
 })
-
-.catch(()=>{
-
-createUserWithEmailAndPassword(auth,email,password)
-.then((userCredential)=>{
-
-localStorage.setItem("userEmail",userCredential.user.email);
-localStorage.setItem("uid", userCredential.user.uid);   // ← Add this line
-
-document.getElementById("loader").style.display="flex";
-setTimeout(()=>{
-window.location.replace("index.html");
-},800);
-
-})
-.catch((error)=>{
-alert(error.message);
-});
-
+.catch(() => {
+    // If user doesn't exist, create new account
+    createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+        localStorage.setItem("userEmail", userCredential.user.email);
+        localStorage.setItem("uid", userCredential.user.uid);
+        document.getElementById("loader").style.display="flex";
+        setTimeout(() => {
+            window.location.replace("index.html");
+        }, 800);
+    })
+    .catch((error) => {
+        alert(error.message);
+    });
 });
 
 };
@@ -270,4 +263,4 @@ drawStars();
 
 </script>
 </body>
-</html>
+    </html>
