@@ -371,7 +371,8 @@ function playClick() {
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";          
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";                                  
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";               
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";                   
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -391,12 +392,28 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
-
-onAuthStateChanged(auth, (user) => {
+const db = getFirestore(app);
+onAuthStateChanged(auth, async (user) => {
   if (!localStorage.getItem("userEmail")) {
     window.location.replace("login.html");
-}
+    return;
+  }
 
+  const uid = localStorage.getItem("uid");
+  if (uid) {
+    try {
+      const docRef = doc(db, "users", uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.unlockTime) localStorage.setItem("unlockTime", data.unlockTime);
+        if (data.challengeMode) localStorage.setItem("challengeMode", data.challengeMode);
+        if (data.challengeStatus) localStorage.setItem("challengeStatus", data.challengeStatus);
+      }
+    } catch(e) {
+      console.log("Using localStorage backup");
+    }
+  }
 });
 
 window.addEventListener("pageshow", function (event) {
