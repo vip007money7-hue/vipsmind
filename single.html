@@ -155,10 +155,26 @@ z-index:9999;
     ">
     Back
     </button>
-
   </div>
 </div>
-<script>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
+  authDomain: "vipsmind-b34fc.firebaseapp.com",
+  projectId: "vipsmind-b34fc",
+  storageBucket: "vipsmind-b34fc.firebasestorage.app",
+  messagingSenderId: "257825847385",
+  appId: "1:257825847385:web:ee3592957535a99e915948"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 const actionBtn = document.getElementById("actionBtn");
 const letter = document.getElementById("letter");
@@ -200,50 +216,75 @@ function confirmExit() {
    window.location.replace("index.html");
 }
 
-actionBtn.onclick = function () {
+actionBtn.onclick = async function () {
 
   if (step === 1) {
-if (!username.value.trim()) {
-    alert("Enter your name");
-    return;
-}
-
-if (!letter.value.trim()) {
-    alert("Write your letter first");
-    return;
-}
+    if (!username.value.trim()) {
+      alert("Enter your name");
+      return;
+    }
+    if (!letter.value.trim()) {
+      alert("Write your letter first");
+      return;
+    }
 
     username.style.display = "none";
-letter.style.display = "none";
-unlock.style.display = "block";
+    letter.style.display = "none";
+    unlock.style.display = "block";
     title.innerText = "Set Unlock Timer";
     actionBtn.innerText = "Place Challenge";
     step = 2;
 
   } else {
 
-if (!unlock.value) {
-    alert("Select date");
-    return;
-}
+    if (!unlock.value) {
+      alert("Select date");
+      return;
+    }
 
-localStorage.setItem("singleName", username.value.trim());
-localStorage.setItem("letter", letter.value);
-localStorage.setItem("lockTime", Date.now());
-localStorage.setItem("unlockTime", new Date(unlock.value).getTime());
-localStorage.setItem("challengeMode", "single");
-localStorage.setItem("challengeStatus", "locked");
-localStorage.removeItem("groupLetters");
-localStorage.removeItem("groupVideos");
-alert("Challenge Placed Successfully");
+    const selectedTime = new Date(unlock.value).getTime();
+    if (selectedTime <= Date.now()) {
+      alert("Select future date");
+      return;
+    }
 
-document.getElementById("loader").style.display="flex";
+    const uid = localStorage.getItem("uid");
+    if (!uid) {
+      alert("Login required");
+      return;
+    }
 
-setTimeout(()=>{
-window.location.replace("goals.html");
-},600);
+    // Local Storage Save
+    localStorage.setItem("singleName", username.value.trim());
+    localStorage.setItem("letter", letter.value);
+    localStorage.setItem("lockTime", Date.now());
+    localStorage.setItem("unlockTime", selectedTime);
+    localStorage.setItem("challengeMode", "single");
+    localStorage.setItem("challengeStatus", "locked");
+    localStorage.removeItem("groupLetters");
+    localStorage.removeItem("groupVideos");
+
+    // Firebase Save
+    try {
+      await setDoc(doc(db, "users", uid), {
+        singleName: username.value.trim(),
+        letter: letter.value,
+        lockTime: Date.now(),
+        unlockTime: selectedTime,
+        challengeMode: "single",
+        challengeStatus: "locked"
+      }, { merge: true });
+    } catch(e) {
+      console.log("Firebase save failed");
+    }
+
+    alert("Challenge Placed Successfully");
+
+    document.getElementById("loader").style.display="flex";
+    setTimeout(()=>{
+      window.location.replace("goals.html");
+    },600);
   }
-
 };
 
 </script>
