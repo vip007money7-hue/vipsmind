@@ -15,6 +15,9 @@ body {
     border: 1px solid white;
     padding: 20px;
     margin-top: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 button {
     padding: 10px 20px;
@@ -22,19 +25,56 @@ button {
 }
 video {
     width: 100%;
+    max-width: 500px;
 }
+#loading { color: #aaa; margin: 30px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-<div id="content"></div>
+<div id="content"><div id="loading">Loading your challenge from cloud...</div></div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
+  authDomain: "vipsmind-b34fc.firebaseapp.com",
+  projectId: "vipsmind-b34fc",
+  storageBucket: "vipsmind-b34fc.firebasestorage.app",
+  messagingSenderId: "257825847385",
+  appId: "1:257825847385:web:ee3592957535a99e915948"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const container = document.getElementById("content");
-let mode = localStorage.getItem("challengeMode") || "";
+const uid = localStorage.getItem("uid");
 
+async function loadChallenge() {
+  if (!uid) {
+    container.innerHTML = "<h3>Login required</h3>";
+    return;
+  }
+
+  try {
+    const docRef = doc(db, "users", uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      if (data.challengeMode) localStorage.setItem("challengeMode", data.challengeMode);
+      if (data.singleName) localStorage.setItem("singleName", data.singleName);
+      if (data.letter) localStorage.setItem("letter", data.letter);
+    }
+  } catch(e) {
+    console.log("Using localStorage backup");
+  }
+
+  // Your original code continues here
+  let mode = localStorage.getItem("challengeMode") || "";
 
 
 if (!mode) {
