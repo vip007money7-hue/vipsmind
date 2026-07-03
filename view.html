@@ -15,9 +15,6 @@ body {
     border: 1px solid white;
     padding: 20px;
     margin-top: 30px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
 }
 button {
     padding: 10px 20px;
@@ -25,16 +22,15 @@ button {
 }
 video {
     width: 100%;
-    max-width: 500px;
 }
-#loading { color: #aaa; margin: 30px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-<div id="content"><div id="loading">Loading your challenge from cloud...</div></div>
+<div id="content"></div>
 
+<!-- FIREBASE MODULE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
@@ -51,36 +47,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+window.loadFromFirebase = async function() {
+    const uid = localStorage.getItem("uid");
+    if (!uid) return {};
+    try {
+        const docRef = doc(db, "users", uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) return docSnap.data();
+    } catch(e) {}
+    return {};
+};
+</script>
+
+<script>
 const container = document.getElementById("content");
-const uid = localStorage.getItem("uid");
 
-async function loadChallenge() {
-  if (!uid) {
-    container.innerHTML = "<h3>Login required</h3>";
-    return;
-  }
+async function loadViewData() {
+    const firebaseData = await window.loadFromFirebase();
+    let mode = firebaseData.challengeMode || localStorage.getItem("challengeMode") || "";
 
-  try {
-    const docRef = doc(db, "users", uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      if (data.challengeMode) localStorage.setItem("challengeMode", data.challengeMode);
-      if (data.singleName) localStorage.setItem("singleName", data.singleName);
-      if (data.letter) localStorage.setItem("letter", data.letter);
+    if (!mode) {
+        container.innerHTML = "<h3>No challenge found</h3>";
+        return;
     }
-  } catch(e) {
-    console.log("Using localStorage backup");
-  }
-
-  // Your original code continues here
-  let mode = localStorage.getItem("challengeMode") || "";
-
-
-if (!mode) {
-    container.innerHTML = "<h3>No challenge found</h3>";
-    throw new Error("Mode missing");
-}
 /* ================= START SCREEN ================= */
 
 function showStartScreen(title, startFunction) {
