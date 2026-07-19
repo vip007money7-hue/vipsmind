@@ -29,7 +29,7 @@
             border-radius: 6px;
             cursor: pointer;
         }
-</style>
+    </style>
 </head>
 
 <body>
@@ -38,34 +38,97 @@
     <div id="nameBox"></div>
     <div id="dates"></div>
 </div>
-
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
-    authDomain: "vipsmind-b34fc.firebaseapp.com",
-    projectId: "vipsmind-b34fc",
-    storageBucket: "vipsmind-b34fc.firebasestorage.app",
-    messagingSenderId: "257825847385",
-    appId: "1:257825847385:web:ee3592957535a99e915948",
-    measurementId: "G-3XVCQ0TCTV"
+  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
+  authDomain: "vipsmind-b34fc.firebaseapp.com",
+  projectId: "vipsmind-b34fc",
+  storageBucket: "vipsmind-b34fc.firebasestorage.app",
+  messagingSenderId: "257825847385",
+  appId: "1:257825847385:web:ee3592957535a99e915948"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.onload = function() {
-    const nameBox = document.getElementById("nameBox");
-    const dates = document.getElementById("dates");
-    const mode = localStorage.getItem("challengeMode");
+window.onload = async function() {
+const nameBox = document.getElementById("nameBox");
+const dates = document.getElementById("dates");
+const uid = localStorage.getItem("uid");
 
-    if (!mode) {
-        dates.innerText = "No challenge placed";
-        return;
+if (uid) {
+    try {
+        const docRef = doc(db, "users", uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+
+            if (data.challengeMode)
+                localStorage.setItem("challengeMode", data.challengeMode);
+
+            if (data.lockTime)
+                localStorage.setItem("lockTime", data.lockTime);
+
+            if (data.unlockTime)
+                localStorage.setItem("unlockTime", data.unlockTime);
+
+            if (data.singleName)
+                localStorage.setItem("singleName", data.singleName);
+
+            if (data.letter)
+                localStorage.setItem("letter", data.letter);
+
+            if (data.groupName)
+                localStorage.setItem("groupName", data.groupName);
+                if (data.groupLetters)
+    localStorage.setItem("groupLetters", JSON.stringify(data.groupLetters));
+
+if (data.groupVideos)
+    localStorage.setItem("groupVideos", JSON.stringify(data.groupVideos));
+
+if (data.videoId)
+    localStorage.setItem("videoId", data.videoId);
+
+if (data.singleVideoId)
+    localStorage.setItem("singleVideoId", data.singleVideoId);
+
+if (data.memberCount)
+    localStorage.setItem("memberCount", data.memberCount);
+
+if (data.currentIndex)
+    localStorage.setItem("currentIndex", data.currentIndex);
+        }
+    } catch (e) {
+        console.log("Using localStorage backup");
+    }
+}
+
+const mode = localStorage.getItem("challengeMode");
+
+if (!mode) {
+    dates.innerText = "No challenge placed";
+    return;
+}
+
+const lock = Number(localStorage.getItem("lockTime"));
+const unlock = Number(localStorage.getItem("unlockTime"));
+const now = Date.now();
+
+    // ===== SHOW NAME =====
+    if (mode === "group-write" || mode === "group-video") {
+        const groupName = localStorage.getItem("groupName");
+        nameBox.innerText = groupName ? "Dear " + groupName : "";
+    }
+    else if (mode === "single" || mode === "single-video") {
+        const singleName = localStorage.getItem("singleName");
+        nameBox.innerText = singleName ? "Dear " + singleName : "";
     }
 
     function format(d) {
@@ -81,78 +144,57 @@ window.onload = function() {
         hours = hours % 12;
         hours = hours ? hours : 12;
 
-        return day + "/" + month + "/" + year + " " + hours + ":" + minutes + " " + ampm;
+        return day + "/" + month + "/" + year + " " +
+               hours + ":" + minutes + " " + ampm;
     }
 
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            window.location.replace("login.html");
-            return;
-        }
+    // ===== NO CHALLENGE =====
+    if (!lock || !unlock) {
 
-        const uid = user.uid;
-        let data = {};
+        dates.innerText = "No challenge placed";
 
-        try {
-            const snap = await getDoc(doc(db, "users", uid));
-            if (snap.exists()) data = snap.data();
-        } catch (e) {}
+        let count = 0;
+        const blink = setInterval(() => {
+            dates.style.visibility =
+                dates.style.visibility === "hidden" ? "visible" : "hidden";
+            count++;
+            if (count === 4) {
+                clearInterval(blink);
+                dates.style.visibility = "visible";
+            }
+        }, 300);
 
-        const unlock = Number(data.unlockTime || localStorage.getItem("unlockTime"));
-        const lock = Number(data.lockTime || localStorage.getItem("lockTime"));
-        const now = Date.now();
+        return;
+    }
 
-        const savedMode = data.challengeMode || localStorage.getItem("challengeMode");
+    // ===== LOCKED =====
+    if (now < unlock) {
 
-        if (savedMode === "group-write" || savedMode === "group-video") {
-            const groupName = data.groupName || localStorage.getItem("groupName");
-            nameBox.innerText = groupName ? "Dear " + groupName : "";
-        } else if (savedMode === "single" || savedMode === "single-video") {
-            const singleName = data.singleName || localStorage.getItem("singleName");
-            nameBox.innerText = singleName ? "Dear " + singleName : "";
-        }
+        dates.innerHTML =
+            "<br>Your challenge is locked<br><br>" +
+            "Challenge Locked At: " + format(lock) + "<br><br>" +
+            "Unlocks On: " + format(unlock);
 
-        if (!lock || !unlock) {
-            dates.innerText = "No challenge placed";
+    }
+    else {
 
-            let count = 0;
-            const blink = setInterval(() => {
-                dates.style.visibility =
-                    dates.style.visibility === "hidden" ? "visible" : "hidden";
-                count++;
-                if (count === 4) {
-                    clearInterval(blink);
-                    dates.style.visibility = "visible";
-                }
-            }, 300);
-
-            return;
-        }
-
-        if (now < unlock) {
-            dates.innerHTML =
-                "<br>Your challenge is locked<br><br>" +
-                "Challenge Locked At: " + format(lock) + "<br><br>" +
-                "Unlocks On: " + format(unlock);
-        } else {
-            dates.innerHTML =
-                "<br>Your challenge unlocked<br><br>" +
-                "Challenge Locked At: " + format(lock) +
-                "<br><br>" +
-                "<button onclick='playClick(); startViewing()'>Start Viewing</button>";
-        }
-    });
+        dates.innerHTML =
+            "<br>Your challenge unlocked<br><br>" +
+            "Challenge Locked At: " + format(lock) +
+            "<br><br>" +
+            "<button onclick='playClick(); startViewing()'>Start Viewing</button>";
+    }
 };
 
 function startViewing() {
     window.location.href = "view.html";
 }
-
 function playClick() {
-    const sound = document.getElementById("clickSound");
-    if (!sound) return;
-    sound.currentTime = 0;
-    sound.play();
+  const sound = document.getElementById("clickSound");
+  if (!sound) return;
+
+  sound.currentTime = 0;
+  sound.play();
 }
 </script>
 
@@ -163,7 +205,6 @@ window.onpopstate = function () {
     window.location.href = "index.html";
 };
 </script>
-
 <script>
 const canvas = document.getElementById("stars");
 const ctx = canvas.getContext("2d");
@@ -177,8 +218,8 @@ for (let i = 0; i < 250; i++) {
     stars.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 1.2,
-        speed: (Math.random() * 0.15 + 0.05) * (Math.random() < 0.1 ? 2.2 : 1.75)
+        size: Math.random() * 1.2,   // very small stars
+     speed: (Math.random() * 0.15 + 0.05) * (Math.random() < 0.1 ? 2.2 : 1.75)// slow movement
     });
 }
 
@@ -186,26 +227,32 @@ function drawStars(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     stars.forEach(star => {
+
+        // ⭐ draw tiny star (realistic dot)
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         ctx.fillStyle = "white";
         ctx.fill();
 
-        star.y -= star.speed;
-        star.x += star.speed * 0.6;
+        // 🌌 gentle floating movement (no lines)
+        star.y -= star.speed;        // move UP
+star.x += star.speed * 0.6;  // move RIGHT (slower than Y for smooth angle)
 
-        if (star.y < 0 || star.x > canvas.width) {
-            star.y = canvas.height;
-            star.x = Math.random() * canvas.width * 0.3;
-        }
+        // 🔁 reset when out of screen
+       if (star.y < 0 || star.x > canvas.width) {
+    star.y = canvas.height;          // restart from bottom
+    star.x = Math.random() * canvas.width * 0.3; // start more from left side
+}
     });
 
+    // 🎬 smooth animation (~24fps feel)
     setTimeout(() => {
         requestAnimationFrame(drawStars);
     }, 40);
 }
 
 drawStars();
+
 </script>
 <audio id="clickSound" src="click.mp3"></audio>
 </body>
