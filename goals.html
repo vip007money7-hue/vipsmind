@@ -186,16 +186,17 @@ const now = Date.now();
     }
 };
 
-function startViewing() {
+window.startViewing = function () {
     window.location.href = "view.html";
-}
-function playClick() {
-  const sound = document.getElementById("clickSound");
-  if (!sound) return;
+};
 
-  sound.currentTime = 0;
-  sound.play();
-}
+window.playClick = function () {
+    const sound = document.getElementById("clickSound");
+    if (!sound) return;
+
+    sound.currentTime = 0;
+    sound.play();
+};
 </script>
 
 <script>
@@ -256,4 +257,4 @@ drawStars();
 </script>
 <audio id="clickSound" src="click.mp3"></audio>
 </body>
-    </html>
+</html>
