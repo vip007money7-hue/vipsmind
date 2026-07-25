@@ -30,46 +30,17 @@ video {
 
 <div id="content"></div>
 
-<!-- FIREBASE MODULE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
-  authDomain: "vipsmind-b34fc.firebaseapp.com",
-  projectId: "vipsmind-b34fc",
-  storageBucket: "vipsmind-b34fc.firebasestorage.app",
-  messagingSenderId: "257825847385",
-  appId: "1:257825847385:web:ee3592957535a99e915948"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.loadFromFirebase = async function() {
-    const uid = localStorage.getItem("uid");
-    if (!uid) return {};
-    try {
-        const docRef = doc(db, "users", uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) return docSnap.data();
-    } catch(e) {}
-    return {};
-};
-</script>
-
 <script>
+
 const container = document.getElementById("content");
+let mode = localStorage.getItem("challengeMode") || "";
 
-async function loadViewData() {
-    const firebaseData = await window.loadFromFirebase();
-    let mode = firebaseData.challengeMode || localStorage.getItem("challengeMode") || "";
 
-    if (!mode) {
-        container.innerHTML = "<h3>No challenge found</h3>";
-        return;
-    }
+
+if (!mode) {
+    container.innerHTML = "<h3>No challenge found</h3>";
+    throw new Error("Mode missing");
+}
 /* ================= START SCREEN ================= */
 
 function showStartScreen(title, startFunction) {
@@ -549,7 +520,6 @@ function shareContent() {
         window.open(whatsapp, "_blank");
    }
 }
-    loadViewData();
 </script>
 </body>
-    </html>
+</html>
