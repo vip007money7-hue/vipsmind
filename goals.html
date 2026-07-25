@@ -190,13 +190,13 @@ window.startViewing = function () {
     window.location.href = "view.html";
 };
 
-window.playClick = function () {
+function playClick() {
     const sound = document.getElementById("clickSound");
     if (!sound) return;
 
     sound.currentTime = 0;
     sound.play();
-};
+}
 </script>
 
 <script>
