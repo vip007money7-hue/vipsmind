@@ -187,6 +187,51 @@ star.x += star.speed * 0.6;  // move RIGHT (slower than Y for smooth angle)
 
 drawStars();
 </script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
+  authDomain: "vipsmind-b34fc.firebaseapp.com",
+  projectId: "vipsmind-b34fc",
+  storageBucket: "vipsmind-b34fc.firebasestorage.app",
+  messagingSenderId: "257825847385",
+  appId: "1:257825847385:web:ee3592957535a99e915948"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!localStorage.getItem("userEmail")) {
+    window.location.replace("login.html");
+    return;
+  }
+
+  const uid = localStorage.getItem("uid");
+  if (uid) {
+    try {
+      const docRef = doc(db, "users", uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.unlockTime) localStorage.setItem("unlockTime", data.unlockTime);
+        if (data.lockTime) localStorage.setItem("lockTime", data.lockTime);
+        if (data.challengeMode) localStorage.setItem("challengeMode", data.challengeMode);
+        if (data.challengeStatus) localStorage.setItem("challengeStatus", data.challengeStatus);
+        if (data.singleName) localStorage.setItem("singleName", data.singleName);
+        if (data.groupName) localStorage.setItem("groupName", data.groupName);
+      }
+    } catch(e) {
+      console.log("Using localStorage backup");
+    }
+  }
+  window.onload(); // Refresh the page content after loading cloud data
+});
+</script>
 </script>
 <audio id="clickSound" src="click.mp3"></audio>
 </body>
