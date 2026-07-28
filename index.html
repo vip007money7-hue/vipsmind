@@ -192,7 +192,7 @@ const singleBtn = document.getElementById("singleBtn");
 const groupBtn = document.getElementById("groupBtn");
 const goalsBtn = document.querySelector(".goals-tag");
 
-const unlockTime = Number(localStorage.getItem("unlockTime"));
+let unlockTime = Number(localStorage.getItem("unlockTime")) || 0;
 
 /* GOALS BUTTON */
 goalsBtn.onclick = function () {
@@ -350,7 +350,6 @@ function drawStars() {
 
     }
 
-
 //  ANIMATION LOOP
 function animate() {
     drawStars();
@@ -367,32 +366,25 @@ function playClick() {
   sound.currentTime = 0;
   sound.play();
 }
-</script>                                                                                                                                           <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";          
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";               
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";                   
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+</script>          
+   <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
-    authDomain: "vipsmind-b34fc.firebaseapp.com",
-    projectId: "vipsmind-b34fc",
-    storageBucket: "vipsmind-b34fc.firebasestorage.app",
-    messagingSenderId: "257825847385",
-    appId: "1:257825847385:web:ee3592957535a99e915948",
-    measurementId: "G-3XVCQ0TCTV"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
+  authDomain: "vipsmind-b34fc.firebaseapp.com",
+  projectId: "vipsmind-b34fc",
+  storageBucket: "vipsmind-b34fc.firebasestorage.app",
+  messagingSenderId: "257825847385",
+  appId: "1:257825847385:web:ee3592957535a99e915948"
+};
 
-  // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
 onAuthStateChanged(auth, async (user) => {
   if (!localStorage.getItem("userEmail")) {
     window.location.replace("login.html");
@@ -404,26 +396,21 @@ onAuthStateChanged(auth, async (user) => {
     try {
       const docRef = doc(db, "users", uid);
       const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data.unlockTime) localStorage.setItem("unlockTime", data.unlockTime);
-        if (data.challengeMode) localStorage.setItem("challengeMode", data.challengeMode);
-        if (data.challengeStatus) localStorage.setItem("challengeStatus", data.challengeStatus);
-      }
+ if (docSnap.exists()) {
+  const data = docSnap.data();
+  if (data.unlockTime) {
+    unlockTime = data.unlockTime;
+    localStorage.setItem("unlockTime", data.unlockTime);
+  }
+  if (data.challengeMode) localStorage.setItem("challengeMode", data.challengeMode);
+  if (data.challengeStatus) localStorage.setItem("challengeStatus", data.challengeStatus);
+}
     } catch(e) {
       console.log("Using localStorage backup");
     }
   }
 });
-
-window.addEventListener("pageshow", function (event) {
-    if (event.persisted) {
-        document.getElementById("loader").style.display = "none";
-    }
-});
-   
-
 </script>          
 <audio id="clickSound" src="click.mp3"></audio>
 </body>
-</html>    
+</html>   
