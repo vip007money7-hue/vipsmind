@@ -38,77 +38,11 @@
     <div id="nameBox"></div>
     <div id="dates"></div>
 </div>
-<script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
-  authDomain: "vipsmind-b34fc.firebaseapp.com",
-  projectId: "vipsmind-b34fc",
-  storageBucket: "vipsmind-b34fc.firebasestorage.app",
-  messagingSenderId: "257825847385",
-  appId: "1:257825847385:web:ee3592957535a99e915948"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-window.onload = async function() {
+<script>
+window.onload = function() {
 const nameBox = document.getElementById("nameBox");
 const dates = document.getElementById("dates");
-const uid = localStorage.getItem("uid");
-
-if (uid) {
-    try {
-        const docRef = doc(db, "users", uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-
-            if (data.challengeMode)
-                localStorage.setItem("challengeMode", data.challengeMode);
-
-            if (data.lockTime)
-                localStorage.setItem("lockTime", data.lockTime);
-
-            if (data.unlockTime)
-                localStorage.setItem("unlockTime", data.unlockTime);
-
-            if (data.singleName)
-                localStorage.setItem("singleName", data.singleName);
-
-            if (data.letter)
-                localStorage.setItem("letter", data.letter);
-
-            if (data.groupName)
-                localStorage.setItem("groupName", data.groupName);
-                if (data.groupLetters)
-    localStorage.setItem("groupLetters", JSON.stringify(data.groupLetters));
-
-if (data.groupVideos)
-    localStorage.setItem("groupVideos", JSON.stringify(data.groupVideos));
-
-if (data.videoId)
-    localStorage.setItem("videoId", data.videoId);
-
-if (data.singleVideoId)
-    localStorage.setItem("singleVideoId", data.singleVideoId);
-
-if (data.memberCount)
-    localStorage.setItem("memberCount", data.memberCount);
-
-if (data.currentIndex)
-    localStorage.setItem("currentIndex", data.currentIndex);
-        }
-    } catch (e) {
-        console.log("Using localStorage backup");
-    }
-}
 
 const mode = localStorage.getItem("challengeMode");
 
@@ -117,9 +51,9 @@ if (!mode) {
     return;
 }
 
-const lock = Number(localStorage.getItem("lockTime"));
-const unlock = Number(localStorage.getItem("unlockTime"));
-const now = Date.now();
+    const lock = Number(localStorage.getItem("lockTime"));
+    const unlock = Number(localStorage.getItem("unlockTime"));
+    const now = Date.now();
 
     // ===== SHOW NAME =====
     if (mode === "group-write" || mode === "group-video") {
@@ -186,16 +120,15 @@ const now = Date.now();
     }
 };
 
-window.startViewing = function () {
+function startViewing() {
     window.location.href = "view.html";
-};
-
+}
 function playClick() {
-    const sound = document.getElementById("clickSound");
-    if (!sound) return;
+  const sound = document.getElementById("clickSound");
+  if (!sound) return;
 
-    sound.currentTime = 0;
-    sound.play();
+  sound.currentTime = 0;
+  sound.play();
 }
 </script>
 
@@ -253,7 +186,7 @@ star.x += star.speed * 0.6;  // move RIGHT (slower than Y for smooth angle)
 }
 
 drawStars();
-
+</script>
 </script>
 <audio id="clickSound" src="click.mp3"></audio>
 </body>
