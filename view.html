@@ -34,19 +34,24 @@ video {
 
 const container = document.getElementById("content");
 let mode = localStorage.getItem("challengeMode") || "";
+
 // Cloud Storage Load
 const uid = localStorage.getItem("uid");
 if (uid) {
-  const docRef = doc(db, "users", uid);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    const data = docSnap.data();
-    if (data.challengeMode) mode = data.challengeMode;
-    if (data.singleName) localStorage.setItem("singleName", data.singleName);
-    if (data.letter) localStorage.setItem("letter", data.letter);
-    if (data.groupName) localStorage.setItem("groupName", data.groupName);
-    if (data.groupLetters) localStorage.setItem("groupLetters", JSON.stringify(data.groupLetters));
-    if (data.groupVideos) localStorage.setItem("groupVideos", JSON.stringify(data.groupVideos));
+  try {
+    const docRef = doc(db, "users", uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      if (data.challengeMode) mode = data.challengeMode;
+      if (data.singleName) localStorage.setItem("singleName", data.singleName);
+      if (data.letter) localStorage.setItem("letter", data.letter);
+      if (data.groupName) localStorage.setItem("groupName", data.groupName);
+      if (data.groupLetters) localStorage.setItem("groupLetters", JSON.stringify(data.groupLetters));
+      if (data.groupVideos) localStorage.setItem("groupVideos", JSON.stringify(data.groupVideos));
+    }
+  } catch(e) {
+    console.log("Cloud load failed, using localStorage");
   }
 }
 
@@ -551,4 +556,4 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 </script>
 </body>
-    </html>
+</html>
