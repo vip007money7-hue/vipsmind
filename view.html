@@ -34,8 +34,21 @@ video {
 
 const container = document.getElementById("content");
 let mode = localStorage.getItem("challengeMode") || "";
-
-
+// Cloud Storage Load
+const uid = localStorage.getItem("uid");
+if (uid) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    if (data.challengeMode) mode = data.challengeMode;
+    if (data.singleName) localStorage.setItem("singleName", data.singleName);
+    if (data.letter) localStorage.setItem("letter", data.letter);
+    if (data.groupName) localStorage.setItem("groupName", data.groupName);
+    if (data.groupLetters) localStorage.setItem("groupLetters", JSON.stringify(data.groupLetters));
+    if (data.groupVideos) localStorage.setItem("groupVideos", JSON.stringify(data.groupVideos));
+  }
+}
 
 if (!mode) {
     container.innerHTML = "<h3>No challenge found</h3>";
@@ -521,5 +534,21 @@ function shareContent() {
    }
 }
 </script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
+  authDomain: "vipsmind-b34fc.firebaseapp.com",
+  projectId: "vipsmind-b34fc",
+  storageBucket: "vipsmind-b34fc.firebasestorage.app",
+  messagingSenderId: "257825847385",
+  appId: "1:257825847385:web:ee3592957535a99e915948"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+</script>
 </body>
-</html>
+    </html>
