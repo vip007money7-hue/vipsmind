@@ -229,7 +229,10 @@ onAuthStateChanged(auth, async (user) => {
       console.log("Using localStorage backup");
     }
   }
-  window.onload(); // Refresh the page content after loading cloud data
+    // Refresh the page content after loading cloud data
+  setTimeout(() => {
+    window.onload();
+  }, 100);
 });
 </script>
 </script>
