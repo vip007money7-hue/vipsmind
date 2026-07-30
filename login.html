@@ -170,7 +170,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-window.login = function(){
+window.login = async function(){
 
 const email = document.getElementById("email").value.trim();
 
@@ -181,31 +181,27 @@ if(!email){
 
 const password = "vipsmind_user";
 
-// Try to sign in first (best for returning users)
-signInWithEmailAndPassword(auth, email, password)
-.then((userCredential) => {
+document.getElementById("loader").style.display="flex";
+
+try {
+    let userCredential;
+    try {
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
+    } catch {
+        userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    }
+
     localStorage.setItem("userEmail", userCredential.user.email);
     localStorage.setItem("uid", userCredential.user.uid);
-    document.getElementById("loader").style.display="flex";
+
     setTimeout(() => {
         window.location.replace("index.html");
     }, 800);
-})
-.catch(() => {
-    // If user doesn't exist, create new account
-    createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-        localStorage.setItem("userEmail", userCredential.user.email);
-        localStorage.setItem("uid", userCredential.user.uid);
-        document.getElementById("loader").style.display="flex";
-        setTimeout(() => {
-            window.location.replace("index.html");
-        }, 800);
-    })
-    .catch((error) => {
-        alert(error.message);
-    });
-});
+
+} catch (error) {
+    document.getElementById("loader").style.display="none";
+    alert("Error: " + error.message);
+}
 
 };
 
