@@ -31,242 +31,247 @@ video {
 <div id="content"></div>
 
 <script>
-
 const container = document.getElementById("content");
 let mode = localStorage.getItem("challengeMode") || "";
+// Wait for cloud data to load
+setTimeout(function() {
+  mode = localStorage.getItem("challengeMode") || mode;
 
-
-
-if (!mode) {
+  if (!mode) {
     container.innerHTML = "<h3>No challenge found</h3>";
-    throw new Error("Mode missing");
-}
-/* ================= START SCREEN ================= */
+    return;
+  }
 
-function showStartScreen(title, startFunction) {
-    container.innerHTML =
-        "<h2>Dear " + title + "</h2>" +
-        "<h3>Your Challenge is Unlocked</h3>" +
-        "<button id='startBtn'>Start Viewing</button>";
+  /* ================= START SCREEN ================= */
 
-    document.getElementById("startBtn").onclick = startFunction;
-}
+  function showStartScreen(title, startFunction) {
+      container.innerHTML =
+          "<h2>Dear " + title + "</h2>" +
+          "<h3>Your Challenge is Unlocked</h3>" +
+          "<button id='startBtn'>Start Viewing</button>";
 
-/* ================= SINGLE WRITE ================= */
+      document.getElementById("startBtn").onclick = startFunction;
+  }
 
-if (mode === "single") {
+  /* ================= SINGLE WRITE ================= */
 
-    const name = localStorage.getItem("singleName");
-    const letter = localStorage.getItem("letter");
+  if (mode === "single") {
 
-    if (!letter) {
-        container.innerHTML = "<h3>No letter found</h3>";
-    } else {
+      const name = localStorage.getItem("singleName");
+      const letter = localStorage.getItem("letter");
 
-        showStartScreen(name, function () {
+      if (!letter) {
+          container.innerHTML = "<h3>No letter found</h3>";
+      } else {
 
-            container.innerHTML =
-                "<div class='card'>" +
-               "<div style='white-space:pre-wrap; text-align:left;'>" + letter + "</div>" +
-             "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
-                "</div>";
-        });
-    }
-}
+          showStartScreen(name, function () {
 
-/* ================= SINGLE VIDEO ================= */
+              container.innerHTML =
+                  "<div class='card'>" +
+                 "<div style='white-space:pre-wrap; text-align:left;'>" + letter + "</div>" +
+               "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
+                  "</div>";
+          });
+      }
+  }
 
-else if (mode === "single-video") {
+  /* ================= SINGLE VIDEO ================= */
 
-    const name = localStorage.getItem("singleName");
+  else if (mode === "single-video") {
 
-    if (!name) {
-        container.innerHTML = "<h3>No video found</h3>";
-    } else {
+      const name = localStorage.getItem("singleName");
 
-        const request = indexedDB.open("VipsMindDB", 1);
+      if (!name) {
+          container.innerHTML = "<h3>No video found</h3>";
+      } else {
 
-        request.onupgradeneeded = function (event) {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains("videos")) {
-                db.createObjectStore("videos", { keyPath: "id" });
-            }
-        };
+          const request = indexedDB.open("VipsMindDB", 1);
 
-        request.onsuccess = function (event) {
+          request.onupgradeneeded = function (event) {
+              const db = event.target.result;
+              if (!db.objectStoreNames.contains("videos")) {
+                  db.createObjectStore("videos", { keyPath: "id" });
+              }
+          };
 
-            const db = event.target.result;
+          request.onsuccess = function (event) {
 
-            const transaction = db.transaction("videos", "readonly");
-            const store = transaction.objectStore("videos");
-            const getRequest = store.get("singleVideo");
+              const db = event.target.result;
 
-            getRequest.onsuccess = function () {
+              const transaction = db.transaction("videos", "readonly");
+              const store = transaction.objectStore("videos");
+              const getRequest = store.get("singleVideo");
 
-                const result = getRequest.result;
+              getRequest.onsuccess = function () {
 
-                if (!result) {
-                    container.innerHTML = "<h3>No saved video found</h3>";
-                    return;
-                }
+                  const result = getRequest.result;
 
-                const videoURL = URL.createObjectURL(result.blob);
+                  if (!result) {
+                      container.innerHTML = "<h3>No saved video found</h3>";
+                      return;
+                  }
 
-                showStartScreen(name, function () {
+                  const videoURL = URL.createObjectURL(result.blob);
 
-                    container.innerHTML =
-                        "<h2>Dear " + name + "</h2>" +
-                        "<div class='card'>" +
-                        "<video src='" + videoURL + "' controls></video>" +
-                       "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
-                        "</div>";
-                });
-            };
-        };
-    }
-}
-/* ================= GROUP WRITE ================= */
+                  showStartScreen(name, function () {
 
-else if (mode === "group-write") {
+                      container.innerHTML =
+                          "<h2>Dear " + name + "</h2>" +
+                          "<div class='card'>" +
+                          "<video src='" + videoURL + "' controls></video>" +
+                         "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
+                          "</div>";
+                  });
+              };
+          };
+      }
+  }
 
-    const groupName = localStorage.getItem("groupName");
-    const letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
+  /* ================= GROUP WRITE ================= */
 
-    if (letters.length === 0) {
-        container.innerHTML = "<h3>No letters found</h3>";
-    } else {
+  else if (mode === "group-write") {
 
-        showStartScreen(groupName, function () {
+      const groupName = localStorage.getItem("groupName");
+      const letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
 
-            let index = 0;
+      if (letters.length === 0) {
+          container.innerHTML = "<h3>No letters found</h3>";
+      } else {
 
-           function showLetter() {
+          showStartScreen(groupName, function () {
 
-    const person = letters[index];
+              let index = 0;
 
-    container.innerHTML =
-        "<h2>Dear " + groupName + "</h2>" +
-        "<h3>" + (index + 1) + " of " + letters.length + "</h3>" +
-        "<div class='card'>" +
-        "<h3>" + person.name + "</h3>" +
-       "<div style='white-space:pre-wrap; text-align:left;'>" + person.text + "</div>" +
-        "<button id='nextBtn'></button>" +
-        "</div>";
+             function showLetter() {
 
-    const btn = document.getElementById("nextBtn");
+      const person = letters[index];
 
-    if (index === letters.length - 1)
-        btn.innerText = "Challenge Completed";
-    else
-        btn.innerText = "Continue to Next";
+      container.innerHTML =
+          "<h2>Dear " + groupName + "</h2>" +
+          "<h3>" + (index + 1) + " of " + letters.length + "</h3>" +
+          "<div class='card'>" +
+          "<h3>" + person.name + "</h3>" +
+         "<div style='white-space:pre-wrap; text-align:left;'>" + person.text + "</div>" +
+          "<button id='nextBtn'></button>" +
+          "</div>";
 
-    btn.onclick = function () {
-        if (index === letters.length - 1)
-            showCompletionScreen();
-        else {
-            index++;
-            showLetter();
-        }
-    };
-}
-            
+      const btn = document.getElementById("nextBtn");
 
-            showLetter();
-        });
-    }
-}
+      if (index === letters.length - 1)
+          btn.innerText = "Challenge Completed";
+      else
+          btn.innerText = "Continue to Next";
 
-/* ================= GROUP VIDEO ================= */
+      btn.onclick = function () {
+          if (index === letters.length - 1)
+              showCompletionScreen();
+          else {
+              index++;
+              showLetter();
+          }
+      };
+  }
+              
 
-else if (mode === "group-video") {
+              showLetter();
+          });
+      }
+  }
 
-    const videos = JSON.parse(localStorage.getItem("groupVideos")) || [];
+  /* ================= GROUP VIDEO ================= */
 
-    if (videos.length === 0) {
-        container.innerHTML = "<h3>No videos found</h3>";
-    } else {
+  else if (mode === "group-video") {
 
-        let currentIndex = 0;
+      const videos = JSON.parse(localStorage.getItem("groupVideos")) || [];
 
-        const request = indexedDB.open("VipsMindDB", 1);
+      if (videos.length === 0) {
+          container.innerHTML = "<h3>No videos found</h3>";
+      } else {
 
-        request.onupgradeneeded = function (event) {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains("videos")) {
-                db.createObjectStore("videos", { keyPath: "id" });
-            }
-        };
+          let currentIndex = 0;
 
-        request.onsuccess = function (event) {
+          const request = indexedDB.open("VipsMindDB", 1);
 
-            const db = event.target.result;
+          request.onupgradeneeded = function (event) {
+              const db = event.target.result;
+              if (!db.objectStoreNames.contains("videos")) {
+                  db.createObjectStore("videos", { keyPath: "id" });
+              }
+          };
 
-            function showVideo() {
+          request.onsuccess = function (event) {
 
-                const person = videos[currentIndex];
+              const db = event.target.result;
 
-                const transaction = db.transaction("videos", "readonly");
-                const store = transaction.objectStore("videos");
-                const getRequest = store.get(person.id);
+              function showVideo() {
 
-                getRequest.onsuccess = function () {
+                  const person = videos[currentIndex];
 
-                    const result = getRequest.result;
+                  const transaction = db.transaction("videos", "readonly");
+                  const store = transaction.objectStore("videos");
+                  const getRequest = store.get(person.id);
 
-                    if (!result) {
-                        container.innerHTML = "<h3>Video not found</h3>";
-                        return;
-                    }
+                  getRequest.onsuccess = function () {
 
-                    const videoURL = URL.createObjectURL(result.blob);
+                      const result = getRequest.result;
 
-                    container.innerHTML =
-                        "<h2>" + (currentIndex + 1) + " of " + videos.length + "</h2>" +
-                        "<h3>" + person.name + "</h3>" +
-                        "<div class='card'>" +
-                        "<video id='myVideo' src='" + videoURL + "'></video>" +
-                        "<button id='playBtn'>▶️ Start Video</button>" +
-                        "<button id='nextBtn' style='display:none;'></button>" +
-                        "</div>";
+                      if (!result) {
+                          container.innerHTML = "<h3>Video not found</h3>";
+                          return;
+                      }
 
-                    const video = document.getElementById("myVideo");
-                    const playBtn = document.getElementById("playBtn");
-                    const nextBtn = document.getElementById("nextBtn");
+                      const videoURL = URL.createObjectURL(result.blob);
 
-                    playBtn.onclick = function () {
-                        video.requestFullscreen();
-                        video.play();
-                        playBtn.style.display = "none";
-                    };
+                      container.innerHTML =
+                          "<h2>" + (currentIndex + 1) + " of " + videos.length + "</h2>" +
+                          "<h3>" + person.name + "</h3>" +
+                          "<div class='card'>" +
+                          "<video id='myVideo' src='" + videoURL + "'></video>" +
+                          "<button id='playBtn'>▶️ Start Video</button>" +
+                          "<button id='nextBtn' style='display:none;'></button>" +
+                          "</div>";
 
-                    video.onended = function () {
+                      const video = document.getElementById("myVideo");
+                      const playBtn = document.getElementById("playBtn");
+                      const nextBtn = document.getElementById("nextBtn");
 
-                        playBtn.innerText = "Replay";
-                        playBtn.style.display = "inline-block";
+                      playBtn.onclick = function () {
+                          video.requestFullscreen();
+                          video.play();
+                          playBtn.style.display = "none";
+                      };
 
-                        if (currentIndex === videos.length - 1)
-                            nextBtn.innerText = "Challenge Completed";
-                        else
-                            nextBtn.innerText = "Continue to Next";
+                      video.onended = function () {
 
-                        nextBtn.style.display = "inline-block";
-                    };
+                          playBtn.innerText = "Replay";
+                          playBtn.style.display = "inline-block";
 
-                    nextBtn.onclick = function () {
-                        if (currentIndex === videos.length - 1) {
-                       showCompletionScreen();
-                        } else {
-                            currentIndex++;
-                            showVideo();
-                        }
-                    };
-                };
-            }
+                          if (currentIndex === videos.length - 1)
+                              nextBtn.innerText = "Challenge Completed";
+                          else
+                              nextBtn.innerText = "Continue to Next";
 
-            showVideo();
-        };
-    }
-}
+                          nextBtn.style.display = "inline-block";
+                      };
+
+                      nextBtn.onclick = function () {
+                          if (currentIndex === videos.length - 1) {
+                         showCompletionScreen();
+                          } else {
+                              currentIndex++;
+                              showVideo();
+                          }
+                      };
+                  };
+              }
+
+              showVideo();
+          };
+      }
+  }
+
+}, 800);
+
 function showCompletionScreen() {
 
     let titleName = "";
