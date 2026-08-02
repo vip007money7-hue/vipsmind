@@ -272,13 +272,12 @@ actionBtn.onclick = async function () {
         lockTime: Date.now(),
         unlockTime: selectedTime,
         challengeMode: "single",
-        challengeStatus: "locked",
-        createdAt: Date.now()
+        challengeStatus: "locked"
       }, { merge: true });
     } catch(e) {
-      console.log("Firebase save failed, saved locally");
+      console.log("Firebase save failed");
     }
-    document.getElementById("loader").style.display="flex";
+
     alert("Challenge Placed Successfully");
 
     document.getElementById("loader").style.display="flex";
