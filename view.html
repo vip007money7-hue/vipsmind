@@ -33,15 +33,14 @@ video {
 <script>
 const container = document.getElementById("content");
 let mode = localStorage.getItem("challengeMode") || "";
-// Wait for cloud data to load
-setTimeout(function() {
+
+window.startChallenge = function() {
   mode = localStorage.getItem("challengeMode") || mode;
 
   if (!mode) {
     container.innerHTML = "<h3>No challenge found</h3>";
     return;
   }
-
   /* ================= START SCREEN ================= */
 
   function showStartScreen(title, startFunction) {
@@ -270,7 +269,7 @@ setTimeout(function() {
       }
   }
 
-}, 800);
+};
 
 function showCompletionScreen() {
 
@@ -563,7 +562,11 @@ async function loadFromCloud() {
     console.log("Cloud load failed");
   }
 }
-loadFromCloud();
+loadFromCloud().then(() => {
+  if (window.startChallenge) {
+    window.startChallenge();
+  }
+});
 </script>
 </body>
-</html>
+    </html>
