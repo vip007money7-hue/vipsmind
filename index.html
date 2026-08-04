@@ -193,6 +193,10 @@ const groupBtn = document.getElementById("groupBtn");
 const goalsBtn = document.querySelector(".goals-tag");
 
 let unlockTime = Number(localStorage.getItem("unlockTime")) || 0;
+// Hide buttons until cloud data is ready
+singleBtn.style.display = "none";
+groupBtn.style.display = "none";
+timerEl.innerText = "Loading...";
 
 /* GOALS BUTTON */
 goalsBtn.onclick = function () {
@@ -295,7 +299,7 @@ function updateUI() {
         "<br><br>To Unlock";
 }
 
-updateUI();
+
 setInterval(updateUI, 1000);
 
 // STAR BACKGROUND
@@ -404,11 +408,16 @@ onAuthStateChanged(auth, async (user) => {
   }
   if (data.challengeMode) localStorage.setItem("challengeMode", data.challengeMode);
   if (data.challengeStatus) localStorage.setItem("challengeStatus", data.challengeStatus);
+  if (data.singleName) localStorage.setItem("singleName", data.singleName);
+  if (data.letter) localStorage.setItem("letter", data.letter);
+  if (data.lockTime) localStorage.setItem("lockTime", data.lockTime);
 }
     } catch(e) {
       console.log("Using localStorage backup");
     }
   }
+  // Now show correct UI after cloud data is ready
+  updateUI();
 });
 </script>          
 <audio id="clickSound" src="click.mp3"></audio>
