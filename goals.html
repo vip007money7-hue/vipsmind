@@ -218,12 +218,15 @@ onAuthStateChanged(auth, async (user) => {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        if (data.unlockTime) localStorage.setItem("unlockTime", data.unlockTime);
+                if (data.unlockTime) localStorage.setItem("unlockTime", data.unlockTime);
         if (data.lockTime) localStorage.setItem("lockTime", data.lockTime);
         if (data.challengeMode) localStorage.setItem("challengeMode", data.challengeMode);
         if (data.challengeStatus) localStorage.setItem("challengeStatus", data.challengeStatus);
         if (data.singleName) localStorage.setItem("singleName", data.singleName);
         if (data.groupName) localStorage.setItem("groupName", data.groupName);
+        if (data.letter) localStorage.setItem("letter", data.letter);
+        if (data.groupLetters) localStorage.setItem("groupLetters", JSON.stringify(data.groupLetters));
+        if (data.groupVideos) localStorage.setItem("groupVideos", JSON.stringify(data.groupVideos));
       }
     } catch(e) {
       console.log("Using localStorage backup");
