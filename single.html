@@ -227,6 +227,9 @@ actionBtn.onclick = async function () {
       alert("Write your letter first");
       return;
     }
+    // Save values before hiding
+    window.savedName = username.value.trim();
+    window.savedLetter = letter.value.trim();
 
     username.style.display = "none";
     letter.style.display = "none";
@@ -254,9 +257,10 @@ actionBtn.onclick = async function () {
       return;
     }
 
-    // Local Storage Save
-    localStorage.setItem("singleName", username.value.trim());
-    localStorage.setItem("letter", letter.value);
+ 
+        // Local Storage Save
+    localStorage.setItem("singleName", window.savedName);
+    localStorage.setItem("letter", window.savedLetter);
     localStorage.setItem("lockTime", Date.now());
     localStorage.setItem("unlockTime", selectedTime);
     localStorage.setItem("challengeMode", "single");
@@ -267,8 +271,8 @@ actionBtn.onclick = async function () {
     // Firebase Save
     try {
       await setDoc(doc(db, "users", uid), {
-        singleName: username.value.trim(),
-        letter: letter.value,
+                singleName: window.savedName,
+        letter: window.savedLetter,
         lockTime: Date.now(),
         unlockTime: selectedTime,
         challengeMode: "single",
