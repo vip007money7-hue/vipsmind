@@ -235,10 +235,12 @@ window.startChallenge = function() {
                       const nextBtn = document.getElementById("nextBtn");
 
                       playBtn.onclick = function () {
-                          video.requestFullscreen();
-                          video.play();
-                          playBtn.style.display = "none";
-                      };
+    if (video.requestFullscreen) {
+        video.requestFullscreen();
+    }
+    video.play();
+    playBtn.style.display = "none";
+};
 
                       video.onended = function () {
 
@@ -559,7 +561,7 @@ async function loadFromCloud() {
       if (data.lockTime) localStorage.setItem("lockTime", data.lockTime);
     }
   } catch (e) {
-    console.log("Cloud load failed");
+    console.error("Cloud load failed:", e);
   }
 }
 loadFromCloud().then(() => {
@@ -569,4 +571,4 @@ loadFromCloud().then(() => {
 });
 </script>
 </body>
-    </html>
+</html>
