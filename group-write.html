@@ -110,7 +110,21 @@ animation:spin 1s linear infinite;
 
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
+  authDomain: "vipsmind-b34fc.firebaseapp.com",
+  projectId: "vipsmind-b34fc",
+  storageBucket: "vipsmind-b34fc.firebasestorage.app",
+  messagingSenderId: "257825847385",
+  appId: "1:257825847385:web:ee3592957535a99e915948"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const total = Number(localStorage.getItem("memberCount"));
 let index = Number(localStorage.getItem("currentIndex")) || 0;
@@ -176,7 +190,7 @@ function nextPerson(){
     render();
 }
 
-function lockChallenge(){
+async function lockChallenge(){
 
     const value = document.getElementById("unlockInput").value;
 
@@ -186,11 +200,32 @@ function lockChallenge(){
     }
 
     const unlockTime = new Date(value).getTime();
+    const lockTime = Date.now();
+    const groupLetters = JSON.parse(localStorage.getItem("groupLetters")) || [];
+    const groupName = localStorage.getItem("groupName") || "";
 
     localStorage.setItem("unlockTime", unlockTime);
-    localStorage.setItem("lockTime", Date.now());
+    localStorage.setItem("lockTime", lockTime);
     localStorage.setItem("challengeMode", "group-write");
     localStorage.setItem("challengeStatus", "locked");
+
+    // Firebase Save
+    const uid = localStorage.getItem("uid");
+    if (uid) {
+      try {
+        await setDoc(doc(db, "users", uid), {
+          groupName: groupName,
+          groupLetters: groupLetters,
+          lockTime: lockTime,
+          unlockTime: unlockTime,
+          challengeMode: "group-write",
+          challengeStatus: "locked",
+          createdAt: Date.now()
+        }, { merge: true });
+      } catch(e) {
+        console.log("Firebase save failed");
+      }
+    }
 
   document.getElementById("loader").style.display="flex";
 
@@ -198,7 +233,6 @@ setTimeout(()=>{
 window.location.replace("goals.html");
 },600);
 }
-
 render();
 
 </script>
