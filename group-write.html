@@ -112,8 +112,8 @@ animation:spin 1s linear infinite;
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
 const firebaseConfig = {
   apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
   authDomain: "vipsmind-b34fc.firebaseapp.com",
@@ -124,8 +124,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
-
 const total = Number(localStorage.getItem("memberCount"));
 let index = Number(localStorage.getItem("currentIndex")) || 0;
 
@@ -203,23 +203,21 @@ async function lockChallenge(){
     const lockTime = Date.now();
     const groupLetters = JSON.parse(localStorage.getItem("groupLetters")) || [];
     const groupName = localStorage.getItem("groupName") || "";
-    const uid = localStorage.getItem("uid");
 
-    // DEBUG ALERTS
-    alert("UID: " + uid);
-    alert("Group Name: " + groupName);
-    alert("Letters count: " + groupLetters.length);
-    alert("Letters data: " + JSON.stringify(groupLetters));
+    const user = auth.currentUser;
+    if (!user) {
+        alert("Session expired. Please login again.");
+        window.location.replace("login.html");
+        return;
+    }
+
+    const uid = user.uid;
+    localStorage.setItem("uid", uid);
 
     localStorage.setItem("unlockTime", unlockTime);
     localStorage.setItem("lockTime", lockTime);
     localStorage.setItem("challengeMode", "group-write");
     localStorage.setItem("challengeStatus", "locked");
-
-    if (!uid) {
-      alert("ERROR: No UID found. Login again.");
-      return;
-    }
 
     try {
       await setDoc(doc(db, "users", uid), {
@@ -231,10 +229,9 @@ async function lockChallenge(){
         challengeStatus: "locked",
         createdAt: Date.now()
       }, { merge: true });
-
-      alert("FIREBASE SAVE SUCCESS");
     } catch(e) {
-      alert("FIREBASE SAVE FAILED: " + e.message);
+      alert("Save failed: " + e.message);
+      return;
     }
 
   document.getElementById("loader").style.display="flex";
@@ -243,11 +240,9 @@ setTimeout(()=>{
 window.location.replace("goals.html");
 },600);
 }
-
 render();
 
 </script>
 
 </body>
 </html>
-
