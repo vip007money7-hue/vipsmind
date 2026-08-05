@@ -129,9 +129,9 @@ const db = getFirestore(app);
 const total = Number(localStorage.getItem("memberCount"));
 let index = Number(localStorage.getItem("currentIndex")) || 0;
 
-if(!total || total <= 0){
-    alert("Invalid group setup");
-    window.location.href = "group-setup.html";
+if (!total || total <= 0) {
+  alert("Invalid group setup");
+  window.location.href = "group-setup.html";
 }
 
 const stepText = document.getElementById("stepText");
@@ -141,100 +141,92 @@ const letterInput = document.getElementById("letterInput");
 const writeBox = document.getElementById("writeBox");
 const timeBox = document.getElementById("timeBox");
 
-function render(){
+function render() {
+  if (index < total) {
+    stepText.innerText = (index + 1) + " of " + total;
+    writeBox.style.display = "block";
+    timeBox.style.display = "none";
 
- if(index < total){
-        stepText.innerText = (index+1) + " of " + total;
-
-        writeBox.style.display = "block";
-        timeBox.style.display = "none";
-
-        if(index === total - 1){
-    actionBtn.innerText = "Continue to Set Unlock Timer";
-} else {
-    actionBtn.innerText = "Next Person";
-}
-        actionBtn.onclick = nextPerson;
-
+    if (index === total - 1) {
+      actionBtn.innerText = "Continue to Set Unlock Timer";
     } else {
-        stepText.innerText = total + " of " + total;
-
-        writeBox.style.display = "none";
-        timeBox.style.display = "block";
-
-        actionBtn.innerText = "Place Challenge";
-        actionBtn.onclick = lockChallenge;
+      actionBtn.innerText = "Next Person";
     }
+    actionBtn.onclick = nextPerson;
+  } else {
+    stepText.innerText = total + " of " + total;
+    writeBox.style.display = "none";
+    timeBox.style.display = "block";
+    actionBtn.innerText = "Place Challenge";
+    actionBtn.onclick = lockChallenge;
+  }
 }
 
-function nextPerson(){
+function nextPerson() {
+  const name = nameInput.value.trim();
+  const letter = letterInput.value.trim();
 
-    const name = nameInput.value.trim();
-    const letter = letterInput.value.trim();
+  if (!name || !letter) {
+    alert("Please fill all fields");
+    return;
+  }
 
-    if(!name || !letter){
-        alert("Please fill all fields");
-        return;
-    }
+  let letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
+  letters.push({ name: name, text: letter });
+  localStorage.setItem("groupLetters", JSON.stringify(letters));
 
-    let letters = JSON.parse(localStorage.getItem("groupLetters")) || [];
-    letters.push({name:name, text:letter});
-    localStorage.setItem("groupLetters", JSON.stringify(letters));
+  index++;
+  localStorage.setItem("currentIndex", index);
 
-    index++;
-    localStorage.setItem("currentIndex", index);
+  nameInput.value = "";
+  letterInput.value = "";
 
-    nameInput.value="";
-    letterInput.value="";
-
-    render();
+  render();
 }
 
-async function lockChallenge(){
+async function lockChallenge() {
+  const value = document.getElementById("unlockInput").value;
 
-    const value = document.getElementById("unlockInput").value;
+  if (!value) {
+    alert("Select unlock time");
+    return;
+  }
 
-    if(!value){
-        alert("Select unlock time");
-        return;
+  const unlockTime = new Date(value).getTime();
+  const lockTime = Date.now();
+  const groupLetters = JSON.parse(localStorage.getItem("groupLetters")) || [];
+  const groupName = localStorage.getItem("groupName") || "";
+
+  localStorage.setItem("unlockTime", unlockTime);
+  localStorage.setItem("lockTime", lockTime);
+  localStorage.setItem("challengeMode", "group-write");
+  localStorage.setItem("challengeStatus", "locked");
+
+  // Firebase Save
+  const uid = localStorage.getItem("uid");
+  if (uid) {
+    try {
+      await setDoc(doc(db, "users", uid), {
+        groupName: groupName,
+        groupLetters: groupLetters,
+        lockTime: lockTime,
+        unlockTime: unlockTime,
+        challengeMode: "group-write",
+        challengeStatus: "locked",
+        createdAt: Date.now()
+      }, { merge: true });
+    } catch (e) {
+      console.log("Firebase save failed");
     }
+  }
 
-    const unlockTime = new Date(value).getTime();
-    const lockTime = Date.now();
-    const groupLetters = JSON.parse(localStorage.getItem("groupLetters")) || [];
-    const groupName = localStorage.getItem("groupName") || "";
-
-    localStorage.setItem("unlockTime", unlockTime);
-    localStorage.setItem("lockTime", lockTime);
-    localStorage.setItem("challengeMode", "group-write");
-    localStorage.setItem("challengeStatus", "locked");
-
-    // Firebase Save
-    const uid = localStorage.getItem("uid");
-    if (uid) {
-      try {
-        await setDoc(doc(db, "users", uid), {
-          groupName: groupName,
-          groupLetters: groupLetters,
-          lockTime: lockTime,
-          unlockTime: unlockTime,
-          challengeMode: "group-write",
-          challengeStatus: "locked",
-          createdAt: Date.now()
-        }, { merge: true });
-      } catch(e) {
-        console.log("Firebase save failed");
-      }
-    }
-
-  document.getElementById("loader").style.display="flex";
-
-setTimeout(()=>{
-window.location.replace("goals.html");
-},600);
+  document.getElementById("loader").style.display = "flex";
+  setTimeout(() => {
+    window.location.replace("goals.html");
+  }, 600);
 }
+
 render();
-
 </script>
 
 </body>
