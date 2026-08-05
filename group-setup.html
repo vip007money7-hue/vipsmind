@@ -18,47 +18,20 @@ button{background:#0047ab;color:#fff;border:0;padding:10px 20px}
 <input id="count" type="number" placeholder="Members Count">
 <button onclick="go()">Continue</button>
 </div>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
-  authDomain: "vipsmind-b34fc.firebaseapp.com",
-  projectId: "vipsmind-b34fc",
-  storageBucket: "vipsmind-b34fc.firebasestorage.app",
-  messagingSenderId: "257825847385",
-  appId: "1:257825847385:web:ee3592957535a99e915948"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.go = async function(){
-
+<script>
+function go(){
   const n=gname.value,c=count.value;
   if(!n||c<1){alert("Enter details");return;}
   
-    localStorage.setItem("groupName",n);
+  localStorage.setItem("groupName",n);
   localStorage.setItem("memberCount",c);
   localStorage.setItem("currentIndex", 0);
   localStorage.removeItem("groupLetters");
   localStorage.removeItem("groupVideos");
   localStorage.removeItem("letter");
 
-  // Firebase Save
-  const uid = localStorage.getItem("uid");
-  if (uid) {
-    try {
-      await setDoc(doc(db, "users", uid), {
-        groupName: n,
-        memberCount: Number(c)
-      }, { merge: true });
-    } catch(e) {
-      console.log("Firebase save failed");
-    }
-  }
-const type = localStorage.getItem("groupType");
+  const type = localStorage.getItem("groupType");
 
  if (type === "video") {
    window.location.replace("group-video.html");
