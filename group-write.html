@@ -203,28 +203,38 @@ async function lockChallenge(){
     const lockTime = Date.now();
     const groupLetters = JSON.parse(localStorage.getItem("groupLetters")) || [];
     const groupName = localStorage.getItem("groupName") || "";
+    const uid = localStorage.getItem("uid");
+
+    // DEBUG ALERTS
+    alert("UID: " + uid);
+    alert("Group Name: " + groupName);
+    alert("Letters count: " + groupLetters.length);
+    alert("Letters data: " + JSON.stringify(groupLetters));
 
     localStorage.setItem("unlockTime", unlockTime);
     localStorage.setItem("lockTime", lockTime);
     localStorage.setItem("challengeMode", "group-write");
     localStorage.setItem("challengeStatus", "locked");
 
-    // Firebase Save
-    const uid = localStorage.getItem("uid");
-    if (uid) {
-      try {
-       await setDoc(doc(db, "users", uid), {
-          groupName: groupName,
-          groupLetters: groupLetters,
-          lockTime: lockTime,
-          unlockTime: unlockTime,
-          challengeMode: "group-write",
-          challengeStatus: "locked",
-          createdAt: Date.now()
-        }, { merge: true });
-      } catch(e) {
-        console.log("Firebase save failed");
-      }
+    if (!uid) {
+      alert("ERROR: No UID found. Login again.");
+      return;
+    }
+
+    try {
+      await setDoc(doc(db, "users", uid), {
+        groupName: groupName,
+        groupLetters: groupLetters,
+        lockTime: lockTime,
+        unlockTime: unlockTime,
+        challengeMode: "group-write",
+        challengeStatus: "locked",
+        createdAt: Date.now()
+      }, { merge: true });
+
+      alert("FIREBASE SAVE SUCCESS");
+    } catch(e) {
+      alert("FIREBASE SAVE FAILED: " + e.message);
     }
 
   document.getElementById("loader").style.display="flex";
@@ -233,9 +243,11 @@ setTimeout(()=>{
 window.location.replace("goals.html");
 },600);
 }
+
 render();
 
 </script>
 
 </body>
 </html>
+
