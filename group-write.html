@@ -222,9 +222,12 @@ async function lockChallenge(){
           challengeStatus: "locked",
           createdAt: Date.now()
         }, { merge: true });
-      } catch(e) {
-        console.log("Firebase save failed");
-      }
+      
+
+ } catch (e) {
+     alert(e.message);
+ }
+    }
     }
 
   document.getElementById("loader").style.display="flex";
