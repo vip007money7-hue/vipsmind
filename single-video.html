@@ -383,7 +383,7 @@ async function lockChallenge() {
         throw new Error("Video not found");
       }
 
-      // Upload to Firebase Storage
+    // Upload to Firebase Storage
       const storageRef = ref(storage, "videos/" + uid + "/singleVideo.webm");
       await uploadBytes(storageRef, blob);
       const url = await getDownloadURL(storageRef);
@@ -411,7 +411,6 @@ async function lockChallenge() {
       alert("Save failed: " + e.message);
     }
 }
-
 window.lockChallenge = lockChallenge;
 window.confirmExit = function() {
     sessionStorage.removeItem("backInit");
