@@ -146,7 +146,26 @@ z-index:9999;
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
+  authDomain: "vipsmind-b34fc.firebaseapp.com",
+  projectId: "vipsmind-b34fc",
+  storageBucket: "vipsmind-b34fc.firebasestorage.app",
+  messagingSenderId: "257825847385",
+  appId: "1:257825847385:web:ee3592957535a99e915948"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const firestoreDB = getFirestore(app);
+const storage = getStorage(app);
+
 
 // FIXED BACK CONTROL
 
@@ -214,19 +233,19 @@ let recordedChunks = [];
 let stream;
 /* ================= INDEXED DB SETUP ================= */
 
-let db;
+let videoDB;
 
 const request = indexedDB.open("VipsMindDB", 1);
 
 request.onupgradeneeded = function (event) {
-    db = event.target.result;
-    if (!db.objectStoreNames.contains("videos")) {
-        db.createObjectStore("videos", { keyPath: "id" });
+    videoDB = event.target.result;
+    if (!videoDB.objectStoreNames.contains("videos")) {
+        videoDB.createObjectStore("videos", { keyPath: "id" });
     }
 };
 
 request.onsuccess = function (event) {
-    db = event.target.result;
+    videoDB = event.target.result;
 };
 /* ================= RECORD BUTTON ================= */
 
@@ -273,9 +292,8 @@ recordBtn.onclick = async function () {
 
             const blob = new Blob(recordedChunks, { type: "video/webm" });
 
-           const transaction = db.transaction(["videos"], "readwrite");
+           const transaction = videoDB.transaction(["videos"], "readwrite");
 const store = transaction.objectStore("videos");
-
 store.put({
     id: "singleVideo",
     blob: blob
@@ -324,7 +342,7 @@ function showTimerScreen() {
 
 /* ================= LOCK CHALLENGE ================= */
 
-function lockChallenge() {
+async function lockChallenge() {
 
     const unlock = document.getElementById("unlockInput").value;
 
@@ -333,17 +351,79 @@ function lockChallenge() {
         return;
     }
 
-    localStorage.setItem("lockTime", Date.now());
-    localStorage.setItem("unlockTime", new Date(unlock).getTime());
-    localStorage.setItem("challengeStatus", "locked");
+    document.getElementById("loader").style.display = "flex";
 
-  document.getElementById("loader").style.display="flex";
+    try {
+      await auth.authStateReady();
+      const user = auth.currentUser;
 
-setTimeout(()=>{
-window.location.replace("goals.html");
-},600);
+      if (!user) {
+        alert("Session expired. Please login again.");
+        window.location.replace("login.html");
+        return;
+      }
+
+      const uid = user.uid;
+      localStorage.setItem("uid", uid);
+
+      const unlockTime = new Date(unlock).getTime();
+      const lockTime = Date.now();
+      const singleName = localStorage.getItem("singleName") || "";
+
+      // Get video from IndexedDB
+      const blob = await new Promise((resolve, reject) => {
+        const tx = videoDB.transaction(["videos"], "readonly");
+        const store = tx.objectStore("videos");
+        const req = store.get("singleVideo");
+        req.onsuccess = () => resolve(req.result ? req.result.blob : null);
+        req.onerror = () => reject(req.error);
+      });
+
+      if (!blob) {
+        throw new Error("Video not found");
+      }
+
+      // Upload to Firebase Storage
+      const storageRef = ref(storage, "videos/" + uid + "/singleVideo.webm");
+      await uploadBytes(storageRef, blob);
+      const url = await getDownloadURL(storageRef);
+
+      localStorage.setItem("lockTime", lockTime);
+      localStorage.setItem("unlockTime", unlockTime);
+      localStorage.setItem("challengeMode", "single-video");
+      localStorage.setItem("challengeStatus", "locked");
+      localStorage.setItem("singleVideoUrl", url);
+
+      await setDoc(doc(firestoreDB, "users", uid), {
+        singleName: singleName,
+        singleVideoUrl: url,
+        lockTime: lockTime,
+        unlockTime: unlockTime,
+        challengeMode: "single-video",
+        challengeStatus: "locked",
+        createdAt: Date.now()
+      }, { merge: true });
+
+      window.location.replace("goals.html");
+
+    } catch (e) {
+      document.getElementById("loader").style.display = "none";
+      alert("Save failed: " + e.message);
+    }
 }
 
+window.lockChallenge = lockChallenge;
+
+window.confirmExit = function() {
+    sessionStorage.removeItem("backInit");
+    window.location.replace("index.html");
+};
+
+window.closeExit = function() {
+    const popup = document.getElementById("exitPopup");
+    if (popup) popup.style.display = "none";
+    timerBackCount = 0;
+};
 </script>
 </body>
-</html>
+    </html>
