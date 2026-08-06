@@ -207,14 +207,14 @@ window.onpopstate = function () {
 };
 
 // ❌ Cancel button
-function closeExit() {
+window.closeExit = function() {
     document.getElementById("exitPopup").style.display = "none";
-}
+};
 
 // ✅ Back to Home
-function confirmExit() {
+window.confirmExit = function() {
    window.location.replace("index.html");
-}
+};
 
 actionBtn.onclick = async function () {
 
@@ -298,4 +298,4 @@ actionBtn.onclick = async function () {
 </script>
 
 </body>
-</html>
+  </html>
