@@ -182,44 +182,21 @@ window.startChallenge = function() {
   else if (mode === "group-video") {
 
       const videos = JSON.parse(localStorage.getItem("groupVideos")) || [];
+      const groupName = localStorage.getItem("groupName") || "Group";
 
       if (videos.length === 0) {
           container.innerHTML = "<h3>No videos found</h3>";
       } else {
 
-          let currentIndex = 0;
+          showStartScreen(groupName, function () {
 
-          const request = indexedDB.open("VipsMindDB", 1);
-
-          request.onupgradeneeded = function (event) {
-              const db = event.target.result;
-              if (!db.objectStoreNames.contains("videos")) {
-                  db.createObjectStore("videos", { keyPath: "id" });
-              }
-          };
-
-          request.onsuccess = function (event) {
-
-              const db = event.target.result;
+              let currentIndex = 0;
 
               function showVideo() {
 
                   const person = videos[currentIndex];
 
-                  const transaction = db.transaction("videos", "readonly");
-                  const store = transaction.objectStore("videos");
-                  const getRequest = store.get(person.id);
-
-                  getRequest.onsuccess = function () {
-
-                      const result = getRequest.result;
-
-                      if (!result) {
-                          container.innerHTML = "<h3>Video not found</h3>";
-                          return;
-                      }
-
-                      const videoURL = URL.createObjectURL(result.blob);
+                  function playWithURL(videoURL) {
 
                       container.innerHTML =
                           "<h2>" + (currentIndex + 1) + " of " + videos.length + "</h2>" +
@@ -241,7 +218,6 @@ window.startChallenge = function() {
                       };
 
                       video.onended = function () {
-
                           playBtn.innerText = "Replay";
                           playBtn.style.display = "inline-block";
 
@@ -255,20 +231,44 @@ window.startChallenge = function() {
 
                       nextBtn.onclick = function () {
                           if (currentIndex === videos.length - 1) {
-                         showCompletionScreen();
+                              showCompletionScreen();
                           } else {
                               currentIndex++;
                               showVideo();
                           }
                       };
+                  }
+
+                  // 1) Cloud URL first
+                  if (person.url) {
+                      playWithURL(person.url);
+                      return;
+                  }
+
+                  // 2) Fallback IndexedDB
+                  const request = indexedDB.open("VipsMindDB", 1);
+
+                  request.onsuccess = function (event) {
+                      const db = event.target.result;
+                      const transaction = db.transaction("videos", "readonly");
+                      const store = transaction.objectStore("videos");
+                      const getRequest = store.get(person.id);
+
+                      getRequest.onsuccess = function () {
+                          const result = getRequest.result;
+                          if (!result) {
+                              container.innerHTML = "<h3>Video not found</h3>";
+                              return;
+                          }
+                          playWithURL(URL.createObjectURL(result.blob));
+                      };
                   };
               }
 
               showVideo();
-          };
+          });
       }
   }
-
 };
 
 function showCompletionScreen() {
@@ -431,64 +431,65 @@ URL.revokeObjectURL(url);
 else if (mode === "group-video") {
 
 const videos = JSON.parse(localStorage.getItem("groupVideos")) || [];
-
-const request = indexedDB.open("VipsMindDB", 1);
-
-request.onsuccess = function (event) {
-
-const db = event.target.result;
-
 let index = 0;
 
 function downloadNext() {
 
-if(index >= videos.length) return;
+if (index >= videos.length) return;
 
 const person = videos[index];
 
-const transaction = db.transaction("videos","readonly");
-const store = transaction.objectStore("videos");
-const getRequest = store.get(person.id);
-
-getRequest.onsuccess = function(){
-
-const result = getRequest.result;
-
-if(!result){
-index++;
-downloadNext();
-return;
+// Cloud URL
+if (person.url) {
+  const a = document.createElement("a");
+  a.href = person.url;
+  a.download = "VipsMind_" + person.name + ".webm";
+  a.target = "_blank";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  index++;
+  setTimeout(downloadNext, 1500);
+  return;
 }
 
-const blob = new Blob([result.blob],{type:"video/mp4"});
-const url = URL.createObjectURL(blob);
+// Fallback IndexedDB
+const request = indexedDB.open("VipsMindDB", 1);
 
-const a = document.createElement("a");
-a.href = url;
-a.download = "VipsMind_" + person.name + ".mp4";
+request.onsuccess = function (event) {
+  const db = event.target.result;
+  const transaction = db.transaction("videos", "readonly");
+  const store = transaction.objectStore("videos");
+  const getRequest = store.get(person.id);
 
-document.body.appendChild(a);
-a.click();
+  getRequest.onsuccess = function () {
+    const result = getRequest.result;
+    if (!result) {
+      index++;
+      downloadNext();
+      return;
+    }
 
-setTimeout(()=>{
-document.body.removeChild(a);
-URL.revokeObjectURL(url);
+    const blob = new Blob([result.blob], { type: "video/webm" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "VipsMind_" + person.name + ".webm";
+    document.body.appendChild(a);
+    a.click();
 
-index++;
-downloadNext();
-
-},1500);
-
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      index++;
+      downloadNext();
+    }, 1500);
+  };
 };
-
 }
 
 downloadNext();
-
-};
-
 }
-
 }
 
 function shareContent() {
@@ -569,4 +570,4 @@ loadFromCloud().then(() => {
 });
 </script>
 </body>
-</html>
+    </html>
