@@ -76,33 +76,35 @@ window.startChallenge = function() {
 
   /* ================= SINGLE VIDEO ================= */
 
-  else if (mode === "single-video") {
+    else if (mode === "single-video") {
 
       const name = localStorage.getItem("singleName");
+      const cloudUrl = localStorage.getItem("singleVideoUrl");
 
       if (!name) {
           container.innerHTML = "<h3>No video found</h3>";
+      } else if (cloudUrl) {
+
+          showStartScreen(name, function () {
+              container.innerHTML =
+                  "<h2>Dear " + name + "</h2>" +
+                  "<div class='card'>" +
+                  "<video src='" + cloudUrl + "' controls></video>" +
+                  "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
+                  "</div>";
+          });
+
       } else {
 
           const request = indexedDB.open("VipsMindDB", 1);
 
-          request.onupgradeneeded = function (event) {
-              const db = event.target.result;
-              if (!db.objectStoreNames.contains("videos")) {
-                  db.createObjectStore("videos", { keyPath: "id" });
-              }
-          };
-
           request.onsuccess = function (event) {
-
               const db = event.target.result;
-
               const transaction = db.transaction("videos", "readonly");
               const store = transaction.objectStore("videos");
               const getRequest = store.get("singleVideo");
 
               getRequest.onsuccess = function () {
-
                   const result = getRequest.result;
 
                   if (!result) {
@@ -113,12 +115,11 @@ window.startChallenge = function() {
                   const videoURL = URL.createObjectURL(result.blob);
 
                   showStartScreen(name, function () {
-
                       container.innerHTML =
                           "<h2>Dear " + name + "</h2>" +
                           "<div class='card'>" +
                           "<video src='" + videoURL + "' controls></video>" +
-                         "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
+                          "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
                           "</div>";
                   });
               };
@@ -394,37 +395,48 @@ doc.save("VipsMind_Group_Letters.pdf");
 
 else if (mode === "single-video") {
 
+    const cloudUrl = localStorage.getItem("singleVideoUrl");
+    const name = localStorage.getItem("singleName") || "Video";
+
+    if (cloudUrl) {
+      const a = document.createElement("a");
+      a.href = cloudUrl;
+      a.download = "VipsMind_" + name + ".webm";
+      a.target = "_blank";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
+    }
+
     const request = indexedDB.open("VipsMindDB", 1);
 
     request.onsuccess = function (event) {
+      const db = event.target.result;
+      const transaction = db.transaction("videos", "readonly");
+      const store = transaction.objectStore("videos");
+      const getRequest = store.get("singleVideo");
 
-        const db = event.target.result;
-        const transaction = db.transaction("videos", "readonly");
-        const store = transaction.objectStore("videos");
-        const getRequest = store.get("singleVideo");
+      getRequest.onsuccess = function () {
+        const result = getRequest.result;
+        if (!result) {
+          alert("Video not found");
+          return;
+        }
 
-        getRequest.onsuccess = function () {
+        const blob = new Blob([result.blob], { type: "video/webm" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "VipsMind_" + name + ".webm";
+        document.body.appendChild(a);
+        a.click();
 
-            const result = getRequest.result;
-            if (!result) {
-                alert("Video not found");
-                return;
-            }
-
-        const blob = new Blob([result.blob], { type: "video/mp4" });
-const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
- a.href = url;
-a.download = "VipsMind_" + (localStorage.getItem("singleName") || "Video") + ".mp4";
- document.body.appendChild(a);
- a.click();
-
-setTimeout(() => {
-document.body.removeChild(a);
-URL.revokeObjectURL(url);
-}, 1000);
-        };
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 1000);
+      };
     };
 }
 
@@ -555,7 +567,8 @@ async function loadFromCloud() {
       if (data.letter) localStorage.setItem("letter", data.letter);
       if (data.groupName) localStorage.setItem("groupName", data.groupName);
       if (data.groupLetters) localStorage.setItem("groupLetters", JSON.stringify(data.groupLetters));
-      if (data.groupVideos) localStorage.setItem("groupVideos", JSON.stringify(data.groupVideos));
+            if (data.groupVideos) localStorage.setItem("groupVideos", JSON.stringify(data.groupVideos));
+      if (data.singleVideoUrl) localStorage.setItem("singleVideoUrl", data.singleVideoUrl);
       if (data.unlockTime) localStorage.setItem("unlockTime", data.unlockTime);
       if (data.lockTime) localStorage.setItem("lockTime", data.lockTime);
     }
