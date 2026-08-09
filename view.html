@@ -76,7 +76,57 @@ window.startChallenge = function() {
 
   /* ================= SINGLE VIDEO ================= */
 
-              showStartScreen(name, function () {
+      else if (mode === "single-video") {
+
+      const name = localStorage.getItem("singleName");
+      const cloudUrl = localStorage.getItem("singleVideoUrl");
+
+      if (!name) {
+          container.innerHTML = "<h3>No video found</h3>";
+      } else if (cloudUrl) {
+
+          showStartScreen(name, function () {
+              container.innerHTML =
+                  "<h2>Dear " + name + "</h2>" +
+                  "<div class='card'>" +
+                  "<video id='singleVid' controls style='width:100%;background:#000;'></video>" +
+                  "<p id='vidStatus' style='font-size:14px;opacity:0.8;'>Loading video...</p>" +
+                  "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
+                  "</div>";
+
+              const vid = document.getElementById("singleVid");
+              const status = document.getElementById("vidStatus");
+              vid.src = cloudUrl;
+
+              vid.onloadeddata = function () {
+                  status.innerText = "";
+              };
+              vid.onerror = function () {
+                  status.innerText = "Video failed to load from cloud";
+              };
+          });
+
+      } else {
+
+          const request = indexedDB.open("VipsMindDB", 1);
+
+          request.onsuccess = function (event) {
+              const db = event.target.result;
+              const transaction = db.transaction("videos", "readonly");
+              const store = transaction.objectStore("videos");
+              const getRequest = store.get("singleVideo");
+
+              getRequest.onsuccess = function () {
+                  const result = getRequest.result;
+
+                  if (!result) {
+                      container.innerHTML = "<h3>No saved video found</h3>";
+                      return;
+                  }
+
+                  const videoURL = URL.createObjectURL(result.blob);
+
+                            showStartScreen(name, function () {
               const urlNow = localStorage.getItem("singleVideoUrl") || cloudUrl || "";
 
               container.innerHTML =
@@ -109,8 +159,10 @@ window.startChallenge = function() {
                   status.innerText = "Video failed to load from cloud";
               };
           });
-                          
-        
+              };
+          };
+      }
+  }
 
   /* ================= GROUP WRITE ================= */
 
@@ -568,4 +620,4 @@ loadFromCloud().then(() => {
 });
 </script>
 </body>
-</html>
+    </html>
