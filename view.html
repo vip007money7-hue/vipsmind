@@ -76,69 +76,41 @@ window.startChallenge = function() {
 
   /* ================= SINGLE VIDEO ================= */
 
-      else if (mode === "single-video") {
+              showStartScreen(name, function () {
+              const urlNow = localStorage.getItem("singleVideoUrl") || cloudUrl || "";
 
-      const name = localStorage.getItem("singleName");
-      const cloudUrl = localStorage.getItem("singleVideoUrl");
-
-      if (!name) {
-          container.innerHTML = "<h3>No video found</h3>";
-      } else if (cloudUrl) {
-
-          showStartScreen(name, function () {
               container.innerHTML =
                   "<h2>Dear " + name + "</h2>" +
                   "<div class='card'>" +
-                  "<video id='singleVid' controls style='width:100%;background:#000;'></video>" +
-                  "<p id='vidStatus' style='font-size:14px;opacity:0.8;'>Loading video...</p>" +
+                  "<p id='vidStatus' style='font-size:14px;'>Loading video...</p>" +
+                  "<video id='singleVid' controls playsinline style='width:100%;min-height:200px;background:#111;'></video>" +
                   "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
                   "</div>";
 
+              alert("URL found: " + (urlNow ? "YES" : "NO"));
+              if (urlNow) {
+                alert("URL start: " + urlNow.substring(0, 40));
+              }
+
               const vid = document.getElementById("singleVid");
               const status = document.getElementById("vidStatus");
-              vid.src = cloudUrl;
+
+              if (!urlNow) {
+                status.innerText = "No video URL in cloud data";
+                return;
+              }
+
+              vid.src = urlNow;
 
               vid.onloadeddata = function () {
-                  status.innerText = "";
+                  status.innerText = "Video ready - press play";
               };
               vid.onerror = function () {
                   status.innerText = "Video failed to load from cloud";
               };
           });
-
-      } else {
-
-          const request = indexedDB.open("VipsMindDB", 1);
-
-          request.onsuccess = function (event) {
-              const db = event.target.result;
-              const transaction = db.transaction("videos", "readonly");
-              const store = transaction.objectStore("videos");
-              const getRequest = store.get("singleVideo");
-
-              getRequest.onsuccess = function () {
-                  const result = getRequest.result;
-
-                  if (!result) {
-                      container.innerHTML = "<h3>No saved video found</h3>";
-                      return;
-                  }
-
-                  const videoURL = URL.createObjectURL(result.blob);
-
-                  showStartScreen(name, function () {
-                      container.innerHTML =
-                          "<h2>Dear " + name + "</h2>" +
-                          "<div class='card'>" +
-                          "<video id='singleVidLocal' controls style='width:100%;'></video>" +
-                          "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
-                          "</div>";
-                      document.getElementById("singleVidLocal").src = videoURL;
-                  });
-              };
-          };
-      }
-  }
+                          
+        
 
   /* ================= GROUP WRITE ================= */
 
