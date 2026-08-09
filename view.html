@@ -76,7 +76,7 @@ window.startChallenge = function() {
 
   /* ================= SINGLE VIDEO ================= */
 
-    else if (mode === "single-video") {
+      else if (mode === "single-video") {
 
       const name = localStorage.getItem("singleName");
       const cloudUrl = localStorage.getItem("singleVideoUrl");
@@ -89,9 +89,21 @@ window.startChallenge = function() {
               container.innerHTML =
                   "<h2>Dear " + name + "</h2>" +
                   "<div class='card'>" +
-                  "<video src='" + cloudUrl + "' controls></video>" +
+                  "<video id='singleVid' controls style='width:100%;background:#000;'></video>" +
+                  "<p id='vidStatus' style='font-size:14px;opacity:0.8;'>Loading video...</p>" +
                   "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
                   "</div>";
+
+              const vid = document.getElementById("singleVid");
+              const status = document.getElementById("vidStatus");
+              vid.src = cloudUrl;
+
+              vid.onloadeddata = function () {
+                  status.innerText = "";
+              };
+              vid.onerror = function () {
+                  status.innerText = "Video failed to load from cloud";
+              };
           });
 
       } else {
@@ -118,9 +130,10 @@ window.startChallenge = function() {
                       container.innerHTML =
                           "<h2>Dear " + name + "</h2>" +
                           "<div class='card'>" +
-                          "<video src='" + videoURL + "' controls></video>" +
+                          "<video id='singleVidLocal' controls style='width:100%;'></video>" +
                           "<button onclick=\"showCompletionScreen()\">Challenge Completed</button>" +
                           "</div>";
+                      document.getElementById("singleVidLocal").src = videoURL;
                   });
               };
           };
