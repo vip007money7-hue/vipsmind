@@ -43,13 +43,16 @@ window.startChallenge = function() {
   }
   /* ================= START SCREEN ================= */
 
-  function showStartScreen(title, startFunction) {
+    function showStartScreen(title, startFunction) {
       container.innerHTML =
           "<h2>Dear " + title + "</h2>" +
           "<h3>Your Challenge is Unlocked</h3>" +
-          "<button id='startBtn'>Start Viewing</button>";
+          "<button id='startBtn' type='button' style='padding:14px 28px;margin-top:20px;background:#0d6efd;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;'>Start Viewing</button>";
 
-      document.getElementById("startBtn").onclick = startFunction;
+      const btn = document.getElementById("startBtn");
+      if (btn) {
+        btn.onclick = startFunction;
+      }
   }
 
   /* ================= SINGLE WRITE ================= */
@@ -605,4 +608,4 @@ loadFromCloud().then(() => {
 });
 </script>
 </body>
-</html>
+    </html>
