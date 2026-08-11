@@ -225,8 +225,9 @@ onAuthStateChanged(auth, async (user) => {
         if (data.singleName) localStorage.setItem("singleName", data.singleName);
         if (data.groupName) localStorage.setItem("groupName", data.groupName);
         if (data.letter) localStorage.setItem("letter", data.letter);
-        if (data.groupLetters) localStorage.setItem("groupLetters", JSON.stringify(data.groupLetters));
+           if (data.groupLetters) localStorage.setItem("groupLetters", JSON.stringify(data.groupLetters));
         if (data.groupVideos) localStorage.setItem("groupVideos", JSON.stringify(data.groupVideos));
+        if (data.singleVideoUrl) localStorage.setItem("singleVideoUrl", data.singleVideoUrl);
       }
     } catch(e) {
       console.log("Using localStorage backup");
