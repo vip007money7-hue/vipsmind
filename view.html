@@ -87,68 +87,151 @@ window.startChallenge = function() {
 
           showStartScreen(name, function () {
 
-              function playWithURL(videoURL) {
-                  container.innerHTML =
-                      "<h2>Dear " + name + "</h2>" +
-                      "<div class='card'>" +
-                      "<video id='myVideo' playsinline></video>" +
-                      "<br><button id='playBtn'>▶️ Start Video</button>" +
-                      "<button id='nextBtn' style='display:none;'>Challenge Completed</button>" +
-                      "</div>";
+              try {
 
-                  const video = document.getElementById("myVideo");
-                  const playBtn = document.getElementById("playBtn");
-                  const nextBtn = document.getElementById("nextBtn");
+                  function playWithURL(videoURL) {
 
-                  video.src = videoURL;
-
-                  playBtn.onclick = function () {
-                      video.play();
-                      playBtn.style.display = "none";
-                  };
-
-                  video.onended = function () {
-                      playBtn.innerText = "Replay";
-                      playBtn.style.display = "inline-block";
-                      nextBtn.style.display = "inline-block";
-                  };
-
-                  video.onerror = function () {
-                      container.innerHTML = "<h3>Video failed to load</h3>";
-                  };
-
-                  nextBtn.onclick = function () {
-                      showCompletionScreen();
-                  };
-              }
-
-              // 1) Cloud first
-              if (cloudUrl) {
-                  playWithURL(cloudUrl);
-                  return;
-              }
-
-              // 2) IndexedDB fallback
-              const request = indexedDB.open("VipsMindDB", 1);
-
-              request.onsuccess = function (event) {
-                  const db = event.target.result;
-                  const transaction = db.transaction("videos", "readonly");
-                  const store = transaction.objectStore("videos");
-                  const getRequest = store.get("singleVideo");
-
-                  getRequest.onsuccess = function () {
-                      const result = getRequest.result;
-                      if (!result) {
-                          container.innerHTML = "<h3>No saved video found</h3>";
+                      if (!videoURL) {
+                          container.innerHTML =
+                              "<h3>Video URL not found</h3>";
                           return;
                       }
-                      playWithURL(URL.createObjectURL(result.blob));
+
+                      container.innerHTML =
+                          "<h2>Dear " + name + "</h2>" +
+                          "<div class='card'>" +
+                          "<video id='myVideo' playsinline controls></video>" +
+                          "<br>" +
+                          "<button id='playBtn'>▶️ Start Video</button>" +
+                          "<button id='nextBtn' style='display:none;'>" +
+                          "Challenge Completed</button>" +
+                          "</div>";
+
+                      const video = document.getElementById("myVideo");
+                      const playBtn = document.getElementById("playBtn");
+                      const nextBtn = document.getElementById("nextBtn");
+
+                      video.src = videoURL;
+                      video.load();
+
+                      playBtn.onclick = async function () {
+
+                          try {
+
+                              await video.play();
+
+                              playBtn.style.display = "none";
+
+                          } catch (error) {
+
+                              console.log("Video play error:", error);
+
+                              container.innerHTML =
+                                  "<h3>Video could not be played</h3>" +
+                                  "<p style='opacity:0.7;'>" +
+                                  "Please try again." +
+                                  "</p>";
+                          }
+                      };
+
+                      video.onended = function () {
+
+                          playBtn.innerText = "Replay";
+                          playBtn.style.display = "inline-block";
+
+                          nextBtn.style.display = "inline-block";
+                      };
+
+                      video.onerror = function () {
+
+                          console.log(
+                              "Video loading error:",
+                              video.error
+                          );
+
+                          container.innerHTML =
+                              "<h3>Video failed to load</h3>" +
+                              "<p style='opacity:0.7;'>" +
+                              "The video URL could not be loaded." +
+                              "</p>";
+                      };
+
+                      nextBtn.onclick = function () {
+                          showCompletionScreen();
+                      };
+                  }
+
+                  /* ================= CLOUD VIDEO ================= */
+
+                  if (cloudUrl) {
+
+                      playWithURL(cloudUrl);
+                      return;
+                  }
+
+                  /* ================= INDEXED DB FALLBACK ================= */
+
+                  const request =
+                      indexedDB.open("VipsMindDB", 1);
+
+                  request.onerror = function () {
+
+                      container.innerHTML =
+                          "<h3>Video could not be loaded</h3>";
                   };
-              };
+
+                  request.onsuccess = function (event) {
+
+                      const db = event.target.result;
+
+                      const transaction =
+                          db.transaction("videos", "readonly");
+
+                      const store =
+                          transaction.objectStore("videos");
+
+                      const getRequest =
+                          store.get("singleVideo");
+
+                      getRequest.onsuccess = function () {
+
+                          const result = getRequest.result;
+
+                          if (!result) {
+
+                              container.innerHTML =
+                                  "<h3>No saved video found</h3>";
+
+                              return;
+                          }
+
+                          playWithURL(
+                              URL.createObjectURL(result.blob)
+                          );
+                      };
+
+                      getRequest.onerror = function () {
+
+                          container.innerHTML =
+                              "<h3>Could not read saved video</h3>";
+                      };
+                  };
+
+              } catch (error) {
+
+                  console.log(
+                      "Single video start error:",
+                      error
+                  );
+
+                  container.innerHTML =
+                      "<h3>Unable to open video</h3>";
+              }
+
           });
       }
   }
+  
   /* ================= GROUP WRITE ================= */
 
   else if (mode === "group-write") {
@@ -605,4 +688,4 @@ loadFromCloud().then(() => {
 });
 </script>
 </body>
-</html>
+    </html>
