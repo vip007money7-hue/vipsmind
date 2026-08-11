@@ -76,154 +76,65 @@ window.startChallenge = function() {
 
   /* ================= SINGLE VIDEO ================= */
 
+    else if (mode === "single-video") {
 
+      const name = localStorage.getItem("singleName");
 
-else if (mode === "single-video") {
+      if (!name) {
+          container.innerHTML = "<h3>No video found</h3>";
+      } else {
 
-    const name = localStorage.getItem("singleName");
-    const cloudUrl = localStorage.getItem("singleVideoUrl");
+          showStartScreen(name, function () {
 
-    if (!name) {
-        container.innerHTML = "<h3>No video found</h3>";
-        return;
-    }
+              const cloudUrl = localStorage.getItem("singleVideoUrl");
 
-    function playWithURL(videoURL) {
+              function playWithURL(videoURL) {
+                  container.innerHTML =
+                      "<h2>Dear " + name + "</h2>" +
+                      "<div class='card'>" +
+                      "<video id='myVideo' playsinline style='width:100%;background:#111;'></video>" +
+                      "<br>" +
+                      "<button id='playBtn' type='button' style='padding:14px 28px;margin-top:16px;background:#0d6efd;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;'>Start Video</button>" +
+                      "<button id='nextBtn' type='button' style='display:none;padding:14px 28px;margin-top:16px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;'>Challenge Completed</button>" +
+                      "</div>";
 
-        if (!videoURL) {
-            container.innerHTML =
-                "<h3>Video URL not found</h3>";
-            return;
-        }
+                  const video = document.getElementById("myVideo");
+                  const playBtn = document.getElementById("playBtn");
+                  const nextBtn = document.getElementById("nextBtn");
 
-        container.innerHTML =
-            "<h2>Dear " + name + "</h2>" +
-            "<div class='card'>" +
-            "<video id='myVideo' playsinline controls></video>" +
-            "<br>" +
-            "<button id='playBtn' type='button'>▶️ Start Video</button>" +
-            "<button id='nextBtn' type='button' style='display:none;'>" +
-            "Challenge Completed" +
-            "</button>" +
-            "</div>";
+                  video.src = videoURL;
 
-        const video =
-            document.getElementById("myVideo");
+                  playBtn.onclick = function () {
+                      video.play().catch(function () {});
+                      playBtn.style.display = "none";
+                  };
 
-        const playBtn =
-            document.getElementById("playBtn");
+                  video.onended = function () {
+                      playBtn.innerText = "Replay";
+                      playBtn.style.display = "inline-block";
+                      nextBtn.style.display = "inline-block";
+                  };
 
-        const nextBtn =
-            document.getElementById("nextBtn");
+                  video.onerror = function () {
+                      container.innerHTML = "<h3>Video failed to load</h3>";
+                  };
 
-        video.src = videoURL;
-        video.load();
+                  nextBtn.onclick = function () {
+                      showCompletionScreen();
+                  };
+              }
 
-        playBtn.onclick = async function () {
+              if (cloudUrl) {
+                  playWithURL(cloudUrl);
+                  return;
+              }
 
-            try {
+              container.innerHTML = "<h3>No saved video found</h3>";
+          });
+      }
+  }
 
-                await video.play();
-
-                playBtn.style.display = "none";
-
-            } catch (error) {
-
-                console.log(
-                    "Video play error:",
-                    error
-                );
-
-                container.innerHTML =
-                    "<h3>Video could not be played</h3>" +
-                    "<p>Please try again.</p>";
-            }
-        };
-
-        video.onended = function () {
-
-            playBtn.innerText = "Replay";
-            playBtn.style.display = "inline-block";
-
-            nextBtn.style.display = "inline-block";
-        };
-
-        video.onerror = function () {
-
-            console.log(
-                "Video loading error:",
-                video.error
-            );
-
-            container.innerHTML =
-                "<h3>Video failed to load</h3>";
-        };
-
-        nextBtn.onclick = function () {
-            showCompletionScreen();
-        };
-    }
-
-
-    /* ================= FIREBASE STORAGE URL ================= */
-
-    if (cloudUrl) {
-
-        playWithURL(cloudUrl);
-        return;
-    }
-
-
-    /* ================= INDEXED DB FALLBACK ================= */
-
-    const request =
-        indexedDB.open("VipsMindDB", 1);
-
-    request.onerror = function () {
-
-        container.innerHTML =
-            "<h3>Video could not be loaded</h3>";
-    };
-
-    request.onsuccess = function (event) {
-
-        const db = event.target.result;
-
-        const transaction =
-            db.transaction("videos", "readonly");
-
-        const store =
-            transaction.objectStore("videos");
-
-        const getRequest =
-            store.get("singleVideo");
-
-        getRequest.onsuccess = function () {
-
-            const result = getRequest.result;
-
-            if (!result) {
-
-                container.innerHTML =
-                    "<h3>No saved video found</h3>";
-
-                return;
-            }
-
-            playWithURL(
-                URL.createObjectURL(result.blob)
-            );
-        };
-
-        getRequest.onerror = function () {
-
-            container.innerHTML =
-                "<h3>Could not read saved video</h3>";
-        };
-    };
-}
-  
-  /* ================= GROUP WRITE ================= */
+/* ================= GROUP WRITE ================= */
 
   else if (mode === "group-write") {
 
@@ -274,6 +185,7 @@ else if (mode === "single-video") {
       }
   }
 
+  
   /* ================= GROUP VIDEO ================= */
 
   else if (mode === "group-video") {
