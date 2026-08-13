@@ -523,17 +523,17 @@ function shareContent() {
         name = localStorage.getItem("groupName") || "Group";
     }
 
-   const text =
+const text =
 "I completed my challenge on VipsMind 🎉\n\n" +
 "Try VipsMind here:\n" +
-"https://vip007money7-hue.github.io/vipsmind/";
+"https://vipsmind.in";
 
     if (navigator.share) {
 
         navigator.share({
             title: "VipsMind Challenge",
             text: text,
-     url: "https://vip007money7-hue.github.io/vipsmind/"
+     url: "https://vipsmind.in"
         });
 
     } else {
