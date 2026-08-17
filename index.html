@@ -193,10 +193,11 @@ const groupBtn = document.getElementById("groupBtn");
 const goalsBtn = document.querySelector(".goals-tag");
 
 let unlockTime = Number(localStorage.getItem("unlockTime")) || 0;
-// Hide buttons until cloud data is ready
+// Hide everything until ready
 singleBtn.style.display = "none";
 groupBtn.style.display = "none";
-timerEl.innerText = "Loading...";
+timerEl.style.display = "none";
+document.getElementById("loader").style.display = "flex";
 
 /* GOALS BUTTON */
 goalsBtn.onclick = function () {
@@ -418,6 +419,8 @@ onAuthStateChanged(auth, async (user) => {
   }
   // Now show correct UI after cloud data is ready
   updateUI();
+  document.getElementById("loader").style.display = "none";
+  timerEl.style.display = "block";
 });
 </script>          
 <audio id="clickSound" src="click.mp3"></audio>
