@@ -246,6 +246,11 @@ request.onupgradeneeded = function (event) {
 
 request.onsuccess = function (event) {
     videoDB = event.target.result;
+
+    // Clear any old video when page opens
+    const tx = videoDB.transaction(["videos"], "readwrite");
+    const store = tx.objectStore("videos");
+    store.delete("singleVideo");
 };
 /* ================= RECORD BUTTON ================= */
 
@@ -273,7 +278,12 @@ recordBtn.onclick = async function () {
         preview.srcObject = stream;
 
         recordedChunks = [];
-
+// Clear old video before starting new recording
+if (videoDB) {
+    const tx = videoDB.transaction(["videos"], "readwrite");
+    const store = tx.objectStore("videos");
+    store.delete("singleVideo");
+}
         try {
             mediaRecorder = new MediaRecorder(stream, {
                 mimeType: "video/webm;codecs=vp8"
