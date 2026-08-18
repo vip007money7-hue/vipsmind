@@ -267,6 +267,18 @@ request.onerror = function () {
 };
 request.onsuccess = function (event) {
     videoDB = event.target.result;
+
+    // Only clear old videos if this is the start of a new group (index = 1)
+    if (index === 1) {
+        const tx = videoDB.transaction(["videos"], "readwrite");
+        const store = tx.objectStore("videos");
+
+        for (let i = 1; i <= 20; i++) {
+            store.delete("groupVideo_" + i);
+        }
+
+        localStorage.removeItem("groupVideos");
+    }
 };
 /* ================= STEP TEXT ================= */
 
