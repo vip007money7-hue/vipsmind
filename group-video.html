@@ -169,8 +169,7 @@ z-index:9999;
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
-
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
 const firebaseConfig = {
   apiKey: "AIzaSyAqtkCHpIelkDUsm2pPiZjmW6RqSXXGoZY",
   authDomain: "vipsmind-b34fc.firebaseapp.com",
@@ -352,11 +351,20 @@ recordBtn.onclick = async function () {
 
                 const uid = user.uid;
                 const videoId = "groupVideo_" + index;
+               
+// Stronger upload (small pieces)
+const storageRef = ref(storage, "videos/" + uid + "/" + videoId + ".webm");
+const uploadTask = uploadBytesResumable(storageRef, blob);
 
-                // Upload immediately
-                const storageRef = ref(storage, "videos/" + uid + "/" + videoId + ".webm");
-                await uploadBytes(storageRef, blob);
-                const url = await getDownloadURL(storageRef);
+await new Promise((resolve, reject) => {
+  uploadTask.on('state_changed',
+    () => {},
+    (error) => reject(error),
+    () => resolve()
+  );
+});
+
+const url = await getDownloadURL(storageRef);
 
                 // Save only the link
                 let videos = JSON.parse(localStorage.getItem("groupVideos") || "[]");
