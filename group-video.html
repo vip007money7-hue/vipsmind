@@ -331,33 +331,52 @@ recordBtn.onclick = async function () {
         // STOP RECORDING
         mediaRecorder.stop();
 
-        mediaRecorder.onstop = function () {
+  mediaRecorder.onstop = async function () {
 
             stream.getTracks().forEach(track => track.stop());
 
-         const blob = new Blob(recordedChunks, { type: "video/webm" });
+            const blob = new Blob(recordedChunks, { type: "video/webm" });
 
-            // SAVE VIDEO TO INDEXED DB
-            const transaction = videoDB.transaction(["videos"], "readwrite");
-            const store = transaction.objectStore("videos");
-            
-            store.put({
-                id: "groupVideo_" + index,
-                blob: blob
-            });
+            // Show loader while uploading
+            document.getElementById("loader").style.display = "flex";
 
-            // Save name only in localStorage
-            let videos = JSON.parse(localStorage.getItem("groupVideos") || "[]");
+            try {
+                await auth.authStateReady();
+                const user = auth.currentUser;
 
-            videos.push({
-              name: userName.value.trim(),
-                id: "groupVideo_" + index
-            });
+                if (!user) {
+                    alert("Session expired. Please login again.");
+                    window.location.replace("login.html");
+                    return;
+                }
 
-            localStorage.setItem("groupVideos", JSON.stringify(videos));
+                const uid = user.uid;
+                const videoId = "groupVideo_" + index;
 
-            recordedChunks = [];
-            showSavedScreen();
+                // Upload immediately
+                const storageRef = ref(storage, "videos/" + uid + "/" + videoId + ".webm");
+                await uploadBytes(storageRef, blob);
+                const url = await getDownloadURL(storageRef);
+
+                // Save only the link
+                let videos = JSON.parse(localStorage.getItem("groupVideos") || "[]");
+
+                videos.push({
+                    name: userName.value.trim(),
+                    id: videoId,
+                    url: url
+                });
+
+                localStorage.setItem("groupVideos", JSON.stringify(videos));
+
+                recordedChunks = [];
+                document.getElementById("loader").style.display = "none";
+                showSavedScreen();
+
+            } catch (e) {
+                document.getElementById("loader").style.display = "none";
+                alert("Upload failed: " + e.message);
+            }
         };
 
         recordBtn.innerText = "Start Recording";
@@ -439,44 +458,19 @@ async function lockChallenge() {
       const groupName = localStorage.getItem("groupName") || "";
       let groupVideos = JSON.parse(localStorage.getItem("groupVideos") || "[]");
 
-      // Upload each video from IndexedDB to Firebase Storage
-      const uploadedVideos = [];
-
-      for (let i = 0; i < groupVideos.length; i++) {
-        const item = groupVideos[i];
-
-        const blob = await new Promise((resolve, reject) => {
-          const tx = videoDB.transaction(["videos"], "readonly");
-          const store = tx.objectStore("videos");
-          const req = store.get(item.id);
-          req.onsuccess = () => resolve(req.result ? req.result.blob : null);
-          req.onerror = () => reject(req.error);
-        });
-
-        if (!blob) {
-          throw new Error("Video not found: " + item.id);
-        }
-
-        const storageRef = ref(storage, "videos/" + uid + "/" + item.id + ".webm");
-        await uploadBytes(storageRef, blob);
-        const url = await getDownloadURL(storageRef);
-
-        uploadedVideos.push({
-          name: item.name,
-          id: item.id,
-          url: url
-        });
+      if (groupVideos.length === 0) {
+        throw new Error("No videos found");
       }
 
       localStorage.setItem("lockTime", lockTime);
       localStorage.setItem("unlockTime", unlockTime);
       localStorage.setItem("challengeMode", "group-video");
       localStorage.setItem("challengeStatus", "locked");
-      localStorage.setItem("groupVideos", JSON.stringify(uploadedVideos));
+      localStorage.setItem("groupVideos", JSON.stringify(groupVideos));
 
       await setDoc(doc(firestoreDB, "users", uid), {
         groupName: groupName,
-        groupVideos: uploadedVideos,
+        groupVideos: groupVideos,
         lockTime: lockTime,
         unlockTime: unlockTime,
         challengeMode: "group-video",
@@ -491,6 +485,7 @@ async function lockChallenge() {
       alert("Save failed: " + e.message);
     }
 }
+
 
 window.lockChallenge = lockChallenge;
 
