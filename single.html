@@ -183,6 +183,45 @@ const unlock = document.getElementById("unlock");
 const title = document.getElementById("title");
 
 let step = 1;
+
+function saveDraft() {
+  sessionStorage.setItem("singleLetterDraft", JSON.stringify({
+    step: step,
+    name: username.value,
+    letter: letter.value,
+    savedName: window.savedName || "",
+    savedLetter: window.savedLetter || "",
+    unlock: unlock.value
+  }));
+}
+
+function restoreDraft() {
+  const raw = sessionStorage.getItem("singleLetterDraft");
+  if (!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    if (d.name) username.value = d.name;
+    if (d.letter) letter.value = d.letter;
+    if (d.savedName) window.savedName = d.savedName;
+    if (d.savedLetter) window.savedLetter = d.savedLetter;
+    if (d.unlock) unlock.value = d.unlock;
+    if (d.step === 2) {
+      username.style.display = "none";
+      letter.style.display = "none";
+      unlock.style.display = "block";
+      title.innerText = "Set Unlock Timer";
+      actionBtn.innerText = "Place Challenge";
+      step = 2;
+    }
+  } catch (e) {}
+}
+
+restoreDraft();
+
+username.addEventListener("input", saveDraft);
+letter.addEventListener("input", saveDraft);
+unlock.addEventListener("input", saveDraft);
+
 // 🔥 BACK BUTTON CONTROL
 history.pushState(null, null, location.href);
 
@@ -194,8 +233,9 @@ window.onpopstate = function () {
         letter.style.display = "block";
         unlock.style.display = "none";
         title.innerText = "Write Your Letter";
-        actionBtn.innerText = "Continue to Timer";
+                actionBtn.innerText = "Continue to Timer";
         step = 1;
+        saveDraft();
 
         history.pushState(null, null, location.href);
         return;
@@ -212,7 +252,8 @@ window.closeExit = function() {
 };
 
 // ✅ Back to Home
-window.confirmExit = function() {
+   window.confirmExit = function() {
+   sessionStorage.removeItem("singleLetterDraft");
    window.location.replace("index.html");
 };
 
@@ -237,7 +278,7 @@ actionBtn.onclick = async function () {
     title.innerText = "Set Unlock Timer";
     actionBtn.innerText = "Place Challenge";
     step = 2;
-
+    saveDraft();
   } else {
 
     if (!unlock.value) {
@@ -285,9 +326,9 @@ actionBtn.onclick = async function () {
       alert("Save failed: " + e.message);
       return;
     }
+        sessionStorage.removeItem("singleLetterDraft");
     document.getElementById("loader").style.display="flex";
     alert("Challenge Placed Successfully");
-
     document.getElementById("loader").style.display="flex";
     setTimeout(()=>{
       window.location.replace("goals.html");
