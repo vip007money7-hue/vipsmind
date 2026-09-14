@@ -104,11 +104,15 @@ window.startChallenge = function() {
 
                   video.src = videoURL;
 
-                        playBtn.onclick = function () {
-          video.requestFullscreen();
-          video.play();
-          playBtn.style.display = "none";
-      };
+                        
+   playBtn.onclick = function () {
+    if (video.requestFullscreen) {
+        video.requestFullscreen().catch(function () {});
+    }
+
+    video.play().catch(function () {});
+    playBtn.style.display = "none";
+};
       
                   video.onended = function () {
                       playBtn.innerText = "Replay";
@@ -592,4 +596,4 @@ loadFromCloud().then(() => {
 });
 </script>
 </body>
-    </html>
+</html>
