@@ -92,7 +92,7 @@ window.startChallenge = function() {
                   container.innerHTML =
                       "<h2>Dear " + name + "</h2>" +
                       "<div class='card'>" +
-                      "<video id='myVideo' playsinline style='width:100%;background:#111;'></video>" +
+            "<video id='myVideo' style='width:100%;background:#111;'></video>" +
                       "<br>" +
                       "<button id='playBtn' type='button' style='padding:14px 28px;margin-top:16px;background:#0d6efd;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;'>Start Video</button>" +
                       "<button id='nextBtn' type='button' style='display:none;padding:14px 28px;margin-top:16px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;'>Challenge Completed</button>" +
@@ -104,11 +104,12 @@ window.startChallenge = function() {
 
                   video.src = videoURL;
 
-                  playBtn.onclick = function () {
-                      video.play().catch(function () {});
-                      playBtn.style.display = "none";
-                  };
-
+                        playBtn.onclick = function () {
+          video.requestFullscreen();
+          video.play();
+          playBtn.style.display = "none";
+      };
+      
                   video.onended = function () {
                       playBtn.innerText = "Replay";
                       playBtn.style.display = "inline-block";
@@ -591,4 +592,4 @@ loadFromCloud().then(() => {
 });
 </script>
 </body>
-</html>
+    </html>
