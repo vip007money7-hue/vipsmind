@@ -141,6 +141,29 @@ const letterInput = document.getElementById("letterInput");
 const writeBox = document.getElementById("writeBox");
 const timeBox = document.getElementById("timeBox");
 
+function saveDraft() {
+  sessionStorage.setItem("groupWriteDraft", JSON.stringify({
+    name: nameInput.value,
+    letter: letterInput.value,
+    unlock: document.getElementById("unlockInput").value
+  }));
+}
+
+function restoreDraft() {
+  const raw = sessionStorage.getItem("groupWriteDraft");
+  if (!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    if (d.name) nameInput.value = d.name;
+    if (d.letter) letterInput.value = d.letter;
+    if (d.unlock) document.getElementById("unlockInput").value = d.unlock;
+  } catch (e) {}
+}
+
+nameInput.addEventListener("input", saveDraft);
+letterInput.addEventListener("input", saveDraft);
+document.getElementById("unlockInput").addEventListener("input", saveDraft);
+
 function render(){
 
  if(index < total){
@@ -186,8 +209,10 @@ function nextPerson(){
 
     nameInput.value="";
     letterInput.value="";
+    sessionStorage.removeItem("groupWriteDraft");
 
     render();
+
 }
 
 async function lockChallenge(){
@@ -234,12 +259,14 @@ async function lockChallenge(){
       return;
     }
 
+    sessionStorage.removeItem("groupWriteDraft");
   document.getElementById("loader").style.display="flex";
 
 setTimeout(()=>{
 window.location.replace("goals.html");
 },600);
 }
+restoreDraft();
 render();
 
 </script>
