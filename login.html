@@ -219,9 +219,10 @@ document.getElementById("googleBtn").addEventListener("click", () => {
         },800);
 
     })
-    .catch(() => {
-        alert("Google Sign-in Failed");
-    });
+.catch((error) => {
+    console.error("Google Sign-in Error:", error);
+    alert("Google Sign-in Failed: " + error.code + "\n" + error.message);
+});
 
 });
 
@@ -259,4 +260,4 @@ drawStars();
 
 </script>
 </body>
-</html>
+                                                                     </html>
