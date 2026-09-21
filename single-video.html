@@ -209,12 +209,9 @@ if (recordBtn && recordBtn.innerText === "Stop Recording") {
 }
 
     // ================= START SCREEN =================
-        clearUnusedSingleVideo().then(function () {
-        sessionStorage.removeItem("backInit");
-        window.location.replace("index.html");
-    });
-});
+    window.location.replace("index.html");
 
+});
 function confirmExit() {
     sessionStorage.removeItem("backInit");
     window.location.replace("index.html");
@@ -250,19 +247,6 @@ request.onupgradeneeded = function (event) {
 request.onsuccess = function (event) {
     videoDB = event.target.result;
 };
-
-function clearUnusedSingleVideo() {
-    return new Promise(function (resolve) {
-        if (!videoDB) {
-            resolve();
-            return;
-        }
-        const tx = videoDB.transaction(["videos"], "readwrite");
-        tx.objectStore("videos").delete("singleVideo");
-        tx.oncomplete = function () { resolve(); };
-        tx.onerror = function () { resolve(); };
-    });
-}
 /* ================= RECORD BUTTON ================= */
 
 recordBtn.onclick = async function () {
@@ -273,7 +257,7 @@ recordBtn.onclick = async function () {
     }
 
     /* ================= START RECORDING ================= */
-        if (recordBtn.innerText === "Start Recording") {
+    if (recordBtn.innerText === "Start Recording") {
 
         try {
             stream = await navigator.mediaDevices.getUserMedia({
@@ -308,26 +292,20 @@ recordBtn.onclick = async function () {
 
             const blob = new Blob(recordedChunks, { type: "video/webm" });
 
-            const transaction = videoDB.transaction(["videos"], "readwrite");
-            const store = transaction.objectStore("videos");
-            store.put({
-                id: "singleVideo",
-                blob: blob
-            });
+           const transaction = videoDB.transaction(["videos"], "readwrite");
+const store = transaction.objectStore("videos");
+store.put({
+    id: "singleVideo",
+    blob: blob
+});
 
-            transaction.oncomplete = function () {
-                localStorage.setItem("singleName", userName.value.trim());
-                localStorage.setItem("challengeMode", "single-video");
+localStorage.setItem("singleName", userName.value.trim());
+localStorage.setItem("challengeMode", "single-video");
 
-                stream.getTracks().forEach(track => track.stop());
-                preview.srcObject = null;
-                preview.style.display = "none";
-                showTimerScreen();
-            };
-
-            transaction.onerror = function () {
-                alert("Could not save video on this phone");
-            };
+stream.getTracks().forEach(track => track.stop());
+preview.srcObject = null;
+preview.style.display = "none";
+showTimerScreen();
         };
 
         mediaRecorder.start();
@@ -437,9 +415,7 @@ async function lockChallenge() {
 window.lockChallenge = lockChallenge;
 window.confirmExit = function() {
     sessionStorage.removeItem("backInit");
-    clearUnusedSingleVideo().then(function () {
-        window.location.replace("index.html");
-    });
+    window.location.replace("index.html");
 };
 
 window.closeExit = function() {
