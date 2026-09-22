@@ -154,7 +154,8 @@ getAuth,
 GoogleAuthProvider, 
 signInWithPopup,
 signInWithEmailAndPassword,
-createUserWithEmailAndPassword
+createUserWithEmailAndPassword,
+sendEmailVerification
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -191,8 +192,17 @@ try {
         userCredential = await createUserWithEmailAndPassword(auth, email, password);
     }
 
-    localStorage.setItem("userEmail", userCredential.user.email);
-    localStorage.setItem("uid", userCredential.user.uid);
+    const user = userCredential.user;
+
+    if (!user.emailVerified) {
+        await sendEmailVerification(user);
+        document.getElementById("loader").style.display="none";
+        alert("VIPSMIND sent a verification mail. Open that mail, tap the link, then come back and press Continue.");
+        return;
+    }
+
+    localStorage.setItem("userEmail", user.email);
+    localStorage.setItem("uid", user.uid);
 
     setTimeout(() => {
         window.location.replace("index.html");
@@ -219,10 +229,9 @@ document.getElementById("googleBtn").addEventListener("click", () => {
         },800);
 
     })
-.catch((error) => {
-    console.error("Google Sign-in Error:", error);
-    alert("Google Sign-in Failed: " + error.code + "\n" + error.message);
-});
+    .catch(() => {
+        alert("Google Sign-in Failed");
+    });
 
 });
 
@@ -260,4 +269,4 @@ drawStars();
 
 </script>
 </body>
-                                                                     </html>
+</html>
