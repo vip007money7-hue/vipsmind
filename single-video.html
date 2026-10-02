@@ -202,7 +202,7 @@ if (document.getElementById("unlockInput") !== null) {
 }
 
     // ================= RECORDING SCREEN =================
-if (recordBtn && recordBtn.innerText === "Stop Recording") {
+if (recordBtn && (recordBtn.innerText === "Stop Recording" || recordBtn.innerText === "Saving...")) {
     if (popup) popup.style.display = "flex";
     history.pushState(null, null, location.href); //  VERY IMPORTANT
     return;
@@ -267,10 +267,15 @@ function clearUnusedSingleVideo() {
 
 recordBtn.onclick = async function () {
 
+        if (recordBtn.innerText === "Saving...") {
+        return;
+    }
+
     if (!userName.value.trim()) {
         alert("Enter your name");
         return;
     }
+    
 
     /* ================= START RECORDING ================= */
         if (recordBtn.innerText === "Start Recording") {
@@ -325,7 +330,9 @@ recordBtn.onclick = async function () {
                 showTimerScreen();
             };
 
-            transaction.onerror = function () {
+                        transaction.onerror = function () {
+                recordBtn.disabled = false;
+                recordBtn.innerText = "Start Recording";
                 alert("Could not save video on this phone");
             };
         };
@@ -339,11 +346,12 @@ recordBtn.onclick = async function () {
     /* ================= STOP RECORDING ================= */
     else {
 
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+           if (mediaRecorder && mediaRecorder.state !== "inactive") {
             mediaRecorder.stop();
         }
 
-        recordBtn.innerText = "Start Recording";
+        recordBtn.innerText = "Saving...";
+        recordBtn.disabled = true;
     }
 };
 
@@ -449,4 +457,4 @@ window.closeExit = function() {
 };
 </script>
 </body>
-    </html>
+</html>
