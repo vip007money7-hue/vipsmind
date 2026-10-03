@@ -110,8 +110,9 @@ playClick();
         window.location.replace("single-video.html");
 
     } else {
-        alert("Dear user, because of technical issues, group video is not available for some days. Please use single video, or try again after some days.");
-        return;
+        // Group → save type → go to setup
+        localStorage.setItem("groupType", "video");
+        window.location.replace("group-setup.html");
     }
 }
 </script>
