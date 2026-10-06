@@ -121,6 +121,19 @@ body {
     font-size: 36px;
     color: #aaa;
 }
+
+/* Home Ad Area */
+.home-ad {
+    display: none;
+    position: absolute;
+    top: 470px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    min-height: 100px;
+    text-align: center;
+}
+
 /* Page Loader */
 #loader{
 position:fixed;
@@ -165,6 +178,7 @@ animation:spin 1s linear infinite;
    </div>
    <div class="timer" id="timer"></div>
  </div>
+ <div class="home-ad" id="homeAd"></div>
  <script>
 // CLEAN BACK BUTTON LOGIC - ONLY CHANGE THIS PART
 history.replaceState(null, null, location.href);
@@ -205,16 +219,13 @@ if (!sessionStorage.getItem("vipsmindVisitCounted")) {
     sessionStorage.setItem("vipsmindVisitCounted", "true");
 }
 
-// TEMPORARY TEST DISPLAY
-const visitDisplay = document.createElement("div");
-visitDisplay.innerText = "Visit count: " + visitCount;
-visitDisplay.style.position = "fixed";
-visitDisplay.style.bottom = "10px";
-visitDisplay.style.left = "10px";
-visitDisplay.style.color = "#aaa";
-visitDisplay.style.fontSize = "12px";
-visitDisplay.style.zIndex = "10000";
-document.body.appendChild(visitDisplay);
+// Home ad becomes eligible from the second visit
+const showHomeAd = visitCount >= 2;
+const homeAd = document.getElementById("homeAd");
+
+if (showHomeAd) {
+    homeAd.style.display = "block";
+}
 // Hide everything until ready
 singleBtn.style.display = "none";
 groupBtn.style.display = "none";
@@ -384,7 +395,6 @@ function animate() {
 }
 
 animate();
-
 animate();
 function playClick() {
   const sound = document.getElementById("clickSound");
