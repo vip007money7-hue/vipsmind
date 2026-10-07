@@ -60,6 +60,7 @@ body {
   z-index: 9999;
 }
  
+
 /* left arrow cut */
  .goals-tag::after {
    content: "";
@@ -72,6 +73,7 @@ body {
    border-bottom: 22px solid transparent;
    border-left: 20px solid #ffffff;
 }
+
 
 /* center message */
 .message {
@@ -119,21 +121,6 @@ body {
     font-size: 36px;
     color: #aaa;
 }
-
-/* Home Ad Area */
-.home-ad {
-    display: none;
-    position: absolute;
-    top: 470px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 320px;
-    height: 100px;
-    border: 2px solid white;
-    background: rgba(255,255,255,0.08);
-    text-align: center;
-}
-
 /* Page Loader */
 #loader{
 position:fixed;
@@ -161,6 +148,32 @@ animation:spin 1s linear infinite;
 0%{transform:rotate(0deg);}
 100%{transform:rotate(360deg);}
 }
+.footer {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #222;
+    text-align: center;
+}
+.footer-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 14px;
+}
+.footer-links a {
+    color: #bbb;
+    text-decoration: none;
+    font-size: 13px;
+}
+.footer-links a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+.copyright {
+    color: #888;
+    font-size: 13px;
+}
 </style>
 </head>
 <body>
@@ -178,7 +191,6 @@ animation:spin 1s linear infinite;
    </div>
    <div class="timer" id="timer"></div>
  </div>
- <div class="home-ad" id="homeAd"></div>
  <script>
 // CLEAN BACK BUTTON LOGIC - ONLY CHANGE THIS PART
 history.replaceState(null, null, location.href);
@@ -208,24 +220,6 @@ const groupBtn = document.getElementById("groupBtn");
 const goalsBtn = document.querySelector(".goals-tag");
 
 let unlockTime = Number(localStorage.getItem("unlockTime")) || 0;
-
-// VipsMind visit counter — count each new visit only once per session
-let visitCount = Number(localStorage.getItem("vipsmindVisitCount")) || 0;
-
-if (!sessionStorage.getItem("vipsmindVisitCounted")) {
-    visitCount++;
-
-    localStorage.setItem("vipsmindVisitCount", visitCount);
-    sessionStorage.setItem("vipsmindVisitCounted", "true");
-}
-
-// Home ad becomes eligible from the second visit
-const showHomeAd = visitCount >= 2;
-const homeAd = document.getElementById("homeAd");
-
-if (showHomeAd) {
-    homeAd.style.display = "block";
-}
 // Hide everything until ready
 singleBtn.style.display = "none";
 groupBtn.style.display = "none";
@@ -395,6 +389,7 @@ function animate() {
 }
 
 animate();
+
 animate();
 function playClick() {
   const sound = document.getElementById("clickSound");
@@ -456,5 +451,35 @@ onAuthStateChanged(auth, async (user) => {
 });
 </script>          
 <audio id="clickSound" src="click.mp3"></audio>
+
+<div class="footer">
+
+    <div class="footer-links">
+
+        <a href="privacy-policy.html">
+            Privacy Policy
+        </a>
+
+        <a href="terms.html">
+            Terms
+        </a>
+
+        <a href="contact.html">
+            Contact
+        </a>
+
+        <a href="journal.html">
+            Journal
+        </a>
+
+    </div>
+
+    <div class="copyright">
+        © 2026 VIPS'MIND — A Message To Your Future Self
+    </div>
+
+</div>
+
+
 </body>
 </html>   
