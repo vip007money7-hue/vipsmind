@@ -34,6 +34,39 @@ button {
 video {
     width: 100%;
 }
+.footer {
+    position: absolute;
+    bottom: 25px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding-top: 12px;
+    border-top: 1px solid #222;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 14px;
+}
+
+.footer-links a {
+    color: #bbb;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.footer-links a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.copyright {
+    color: #888;
+    font-size: 13px;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -588,5 +621,24 @@ loadFromCloud().then(() => {
   }
 });
 </script>
+<div class="footer">
+    <div class="footer-links">
+        <a href="privacy-policy.html">
+            Privacy Policy
+        </a>
+        <a href="terms.html">
+            Terms
+        </a>
+        <a href="contact.html">
+            Contact
+        </a>
+        <a href="journal.html">
+            Journal
+        </a>
+    </div>
+    <div class="copyright">
+        © 2026 VIPS'MIND — A Message To Your Future Self
+    </div>
+</div>
 </body>
-    </html>
+</html>
