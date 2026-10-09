@@ -34,15 +34,17 @@ button {
 video {
     width: 100%;
 }
+
 .footer {
-    position: absolute;
-    bottom: 25px;
-    left: 0;
+    display: none;
+    position: static;
     width: 100%;
     text-align: center;
     padding-top: 12px;
+    margin-top: 30px;
     border-top: 1px solid #222;
 }
+
 
 .footer-links {
     display: flex;
@@ -354,6 +356,7 @@ function showCompletionScreen() {
             Thanks For Using VipsMind
         </p>
     `;
+    document.querySelector(".footer").style.display = "block";
 }
 
 function drawLetterPdf(doc, name, letter) {
@@ -641,4 +644,4 @@ loadFromCloud().then(() => {
     </div>
 </div>
 </body>
-</html>
+    </html>
