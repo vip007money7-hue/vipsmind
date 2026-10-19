@@ -151,27 +151,8 @@ const message =
 "But if you are serious about your challenge...\n\n"+
 "Then you are our VIP.";
 
-let i = 0;
-
-function typeText(){
-if(i === 0){
-    typingSound.loop = true;
-    typingSound.play().catch(() => {});
-}
-
-if(i < message.length){
-document.getElementById("text").innerHTML += message.charAt(i);
-i++;
-setTimeout(typeText,28);
-}else{
-document.getElementById("buttons").style.display="block";
-
-typingSound.pause();
-typingSound.currentTime = 0;
-}
-}
-
-typeText();
+document.getElementById("text").innerText = message;
+document.getElementById("buttons").style.display = "block";
 
 /* YES  LOGIN */
 function enter(){
