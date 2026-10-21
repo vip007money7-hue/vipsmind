@@ -122,31 +122,45 @@ body {
     color: #aaa;
 }
 /* Page Loader */
-#loader{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.9);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:9999;
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 9999;
+  gap: 28px;
+  padding: 40px 30px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-.spinner{
-width:40px;
-height:40px;
-border:4px solid rgba(255,255,255,0.2);
-border-top:4px solid white;
-border-radius:50%;
-animation:spin 1s linear infinite;
+#loader .loader-text {
+  color: #ffffff;
+  font-size: 13.5px;
+  line-height: 1.55;
+  max-width: 400px;
+  opacity: 0.01;          /* extremely faint as you asked */
+  font-weight: 400;
 }
 
-@keyframes spin{
-0%{transform:rotate(0deg);}
-100%{transform:rotate(360deg);}
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255,255,255,0.2);
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 .footer {
     position: absolute;
@@ -183,7 +197,12 @@ animation:spin 1s linear infinite;
 </head>
 <body>
 <div id="loader">
-<div class="spinner"></div>
+  <div class="spinner"></div>
+  <div class="loader-text">
+    vipsmind is a secure application platform where users write letters, record video messages, 
+    and configure personal goal capsules to be locked and securely delivered to their future selves. 
+    Please wait while our client-side interface verifies your secure session details......
+  </div>
 </div>
 <canvas id="stars"></canvas>
 <div class="brand">VIPS’MIND</div>
