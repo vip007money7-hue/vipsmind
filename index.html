@@ -180,8 +180,18 @@ animation:spin 1s linear infinite;
 </style>
 </head>
 <body>
-<div id="loader">
-<div class="spinner"></div>
+<div id="loader" style="flex-direction: column; gap: 20px;">
+  <div class="spinner"></div>
+  
+  <!-- Fully visible text layout that informs users and serves as clear application content for the AdSense Bot -->
+  <div class="loader-content" style="max-width: 450px; text-align: center; padding: 0 20px; font-family: system-ui, sans-serif; animation: fadeIn 0.5s ease-in-out;">
+    <p style="color: #ffffff; font-size: 16px; font-weight: 500; margin: 0 0 8px 0; letter-spacing: 0.5px;">
+      Verifying Secure Session details...
+    </p>
+    <p style="color: #aaaaaa; font-size: 13px; line-height: 1.5; margin: 0;">
+      VipsMind is a secure application platform where users write letters, record video messages, and configure personal goal capsules to be locked and securely delivered to their future selves.
+    </p>
+  </div>
 </div>
 <canvas id="stars"></canvas>
 <div class="brand">VIPS’MIND</div>
